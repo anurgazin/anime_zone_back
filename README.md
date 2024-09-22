@@ -1,0 +1,1 @@
+My attempt to create a REST API on Go with using Gin framework
