@@ -17,8 +17,13 @@ func main() {
 	router.GET("/", getDefault)
 
 	router.GET("/anime", funcs.GetAnime)
-	router.GET("/anime/:id", funcs.GetAnimeById)
+	router.GET("/anime/id/:id", funcs.GetAnimeById)
+	router.GET("/anime/title/:title", funcs.GetAnimeByTitle)
 	router.POST("/anime", funcs.PostAnime)
+
+	router.GET("/characters", funcs.GetCharacters)
+	router.GET("/characters/:id", funcs.GetCharactersById)
+	router.POST("/characters", funcs.PostCharacters)
 
 	router.Run("localhost:8080")
 }

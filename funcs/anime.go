@@ -25,6 +25,18 @@ func GetAnimeById(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "anime not found"})
 }
 
+func GetAnimeByTitle(c *gin.Context) {
+	title := c.Param("title")
+
+	for _, a := range anime {
+		if a.Title == title {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "anime not found"})
+}
+
 func PostAnime(c *gin.Context) {
 	var newAnime database.Anime
 
