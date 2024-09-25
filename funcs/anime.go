@@ -44,6 +44,42 @@ func PostAnime(c *gin.Context) {
 		return
 	}
 
+	if checkAnimeExistsById(newAnime.ID) {
+		// If any anime exists, return an error message
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime already exists in our db: " + newAnime.Title})
+		return
+	}
+
 	anime = append(anime, newAnime)
 	c.IndentedJSON(http.StatusCreated, newAnime)
+}
+
+func PutAnime(c *gin.Context) {
+	var updatedAnime database.Anime
+
+	id := c.Param("id")
+
+	if err := c.BindJSON(&updatedAnime); err != nil {
+		return
+	}
+
+	for i, a := range anime {
+		if a.ID == id {
+			anime[i].Title = updatedAnime.Title
+			anime[i].Description = updatedAnime.Description
+			anime[i].Duration = updatedAnime.Duration
+			anime[i].ESRB = updatedAnime.ESRB
+			anime[i].Episodes = updatedAnime.Episodes
+			anime[i].Rating = updatedAnime.Rating
+			anime[i].ReleaseDate = updatedAnime.ReleaseDate
+			anime[i].Status = updatedAnime.Status
+			anime[i].Studio = updatedAnime.Studio
+			anime[i].Type = updatedAnime.Type
+			anime[i].Genre = updatedAnime.Genre
+			c.JSON(http.StatusOK, gin.H{"message": "Anime updated: " + a.ID})
+			return
+		}
+	}
+
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Such Anime not found: " + updatedAnime.Title})
 }

@@ -20,6 +20,7 @@ func main() {
 	router.GET("/anime/id/:id", funcs.GetAnimeById)
 	router.GET("/anime/title/:title", funcs.GetAnimeByTitle)
 	router.POST("/anime", funcs.PostAnime)
+	router.PUT("/anime/:id", funcs.PutAnime)
 
 	router.GET("/characters", funcs.GetCharacters)
 	router.GET("/characters/:id", funcs.GetCharactersById)
