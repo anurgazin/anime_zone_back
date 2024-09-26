@@ -76,7 +76,7 @@ func GetAnimeByTitle(title string) (*Anime, error) {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, fmt.Errorf("no anime found with the given title")
+			return nil, fmt.Errorf("No anime found with the given title")
 		}
 		return nil, fmt.Errorf("error finding anime: %w", err)
 	}
