@@ -50,6 +50,8 @@ type Anime struct {
 	Duration    int       `json:"duration"` // in minutes
 	Status      Status    `json:"status"`
 	ESRB        ESRB      `json:"esrb"`
+	Logo        []string  `json:"logo"`
+	Media       []string  `json:"media"`
 }
 
 // Filters struct represents the filters used to search for anime
