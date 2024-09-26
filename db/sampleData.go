@@ -3,11 +3,13 @@ package database
 import (
 	"fmt"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var SampleAnime = []Anime{
 	{
-		ID:          "bfa7bcb0-6c97-4423-a1bc-92f64cfaab7f",
+		ID:          parseId("bfa7bcb06c974423a1bc92f6"),
 		Title:       "Attack on Titan",
 		ReleaseDate: parseDate("2013-04-07"),
 		Rating:      9.0,
@@ -21,7 +23,7 @@ var SampleAnime = []Anime{
 		ESRB:        M,
 	},
 	{
-		ID:          "49c02c34-2300-4f15-aea3-1a9475f0b4a9",
+		ID:          parseId("49c02c3423004f15aea31a94"),
 		Title:       "Your Name",
 		ReleaseDate: parseDate("2016-08-26"),
 		Rating:      8.9,
@@ -35,7 +37,7 @@ var SampleAnime = []Anime{
 		ESRB:        T,
 	},
 	{
-		ID:          "b2b0a62f-9fcb-4fa8-a07b-8b0f6b27e56a",
+		ID:          parseId("b2b0a62f9fcb4fa8a07b8b0f"),
 		Title:       "My Hero Academia",
 		ReleaseDate: parseDate("2016-04-03"),
 		Rating:      8.0,
@@ -49,7 +51,7 @@ var SampleAnime = []Anime{
 		ESRB:        T,
 	},
 	{
-		ID:          "d8a1f6f1-6e2b-42be-8c56-0edb20d3f19d",
+		ID:          parseId("d8a1f6f16e2b42be8c560edb"),
 		Title:       "Spirited Away",
 		ReleaseDate: parseDate("2001-07-20"),
 		Rating:      8.6,
@@ -63,7 +65,7 @@ var SampleAnime = []Anime{
 		ESRB:        T,
 	},
 	{
-		ID:          "be215d92-1a8f-49e4-b926-58c1e6db7300",
+		ID:          parseId("be215d921a8f49e4b92658c1"),
 		Title:       "One Piece",
 		ReleaseDate: parseDate("1999-10-20"),
 		Rating:      8.7,
@@ -77,7 +79,7 @@ var SampleAnime = []Anime{
 		ESRB:        T,
 	},
 	{
-		ID:          "9d8c3c1e-3f9d-4375-ae43-8dbe658f37ad",
+		ID:          parseId("9d8c3c1e3f9d4375ae438dbe"),
 		Title:       "Demon Slayer",
 		ReleaseDate: parseDate("2019-04-06"),
 		Rating:      8.7,
@@ -91,7 +93,7 @@ var SampleAnime = []Anime{
 		ESRB:        M,
 	},
 	{
-		ID:          "a6a755f2-0545-41be-92d8-92d3f056b39a",
+		ID:          parseId("a6a755f2054541be92d892d3"),
 		Title:       "Cowboy Bebop",
 		ReleaseDate: parseDate("1998-04-03"),
 		Rating:      8.9,
@@ -107,6 +109,13 @@ var SampleAnime = []Anime{
 }
 
 // Utility function to parse the release date
+func parseId(id string) primitive.ObjectID {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		panic(err)
+	}
+	return objID
+}
 func parseDate(dateStr string) time.Time {
 	date, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
@@ -117,7 +126,7 @@ func parseDate(dateStr string) time.Time {
 
 var SampleCharacters = []Character{
 	{
-		ID:        "1",
+		ID:        primitive.NewObjectID(),
 		FirstName: "Eren",
 		LastName:  "Yeager",
 		Age:       19,
@@ -127,7 +136,7 @@ var SampleCharacters = []Character{
 		Status:    "dead",
 	},
 	{
-		ID:        "2",
+		ID:        primitive.NewObjectID(),
 		FirstName: "Mitsuha",
 		LastName:  "Miyamizu",
 		Age:       17,
@@ -137,7 +146,7 @@ var SampleCharacters = []Character{
 		Status:    "alive",
 	},
 	{
-		ID:        "3",
+		ID:        primitive.NewObjectID(),
 		FirstName: "Izuku",
 		LastName:  "Midoriya",
 		Age:       16,
@@ -147,7 +156,7 @@ var SampleCharacters = []Character{
 		Status:    "alive",
 	},
 	{
-		ID:        "4",
+		ID:        primitive.NewObjectID(),
 		FirstName: "Chihiro",
 		LastName:  "Ogino",
 		Age:       10,
@@ -157,7 +166,7 @@ var SampleCharacters = []Character{
 		Status:    "alive",
 	},
 	{
-		ID:        "5",
+		ID:        primitive.NewObjectID(),
 		FirstName: "Monkey D.",
 		LastName:  "Luffy",
 		Age:       19,
@@ -167,7 +176,7 @@ var SampleCharacters = []Character{
 		Status:    "alive",
 	},
 	{
-		ID:        "6",
+		ID:        primitive.NewObjectID(),
 		FirstName: "Tanjiro",
 		LastName:  "Kamado",
 		Age:       15,
@@ -177,7 +186,7 @@ var SampleCharacters = []Character{
 		Status:    "alive",
 	},
 	{
-		ID:        "7",
+		ID:        primitive.NewObjectID(),
 		FirstName: "Spike",
 		LastName:  "Spiegel",
 		Age:       27,

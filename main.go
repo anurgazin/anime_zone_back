@@ -5,7 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"anime_zone/back_end/funcs"
+	database "anime_zone/back_end/db"
+	"anime_zone/back_end/routes"
 )
 
 func getDefault(c *gin.Context) {
@@ -13,19 +14,21 @@ func getDefault(c *gin.Context) {
 }
 
 func main() {
+	database.RunMongo()
+
 	router := gin.Default()
 	router.GET("/", getDefault)
 
-	router.GET("/anime", funcs.GetAnime)
-	router.GET("/anime/id/:id", funcs.GetAnimeById)
-	router.GET("/anime/title/:title", funcs.GetAnimeByTitle)
-	router.POST("/anime", funcs.PostAnime)
-	router.PUT("/anime/:id", funcs.PutAnime)
+	router.GET("/anime", routes.GetAnime)
+	router.GET("/anime/id/:id", routes.GetAnimeById)
+	router.GET("/anime/title/:title", routes.GetAnimeByTitle)
+	router.POST("/anime", routes.PostAnime)
+	router.PUT("/anime/:id", routes.PutAnime)
 
-	router.GET("/characters", funcs.GetCharacters)
-	router.GET("/characters/:id", funcs.GetCharactersById)
-	router.POST("/characters", funcs.PostCharacters)
-	router.PUT("/characters/:id", funcs.PutCharacters)
+	router.GET("/characters", routes.GetCharacters)
+	router.GET("/characters/:id", routes.GetCharactersById)
+	router.POST("/characters", routes.PostCharacters)
+	router.PUT("/characters/:id", routes.PutCharacters)
 
 	router.Run("localhost:8080")
 }

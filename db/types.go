@@ -1,6 +1,10 @@
 package database
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // Define Type, Status, and ESRB as string types with specific values
 type Type string
@@ -36,43 +40,43 @@ const (
 	ESRBNone ESRB = "none"
 )
 
-// Anime struct represents the anime information
+// Define the Anime struct for BSON compatibility
 type Anime struct {
-	ID          string    `json:"id"` // UUID format
-	Title       string    `json:"title"`
-	ReleaseDate time.Time `json:"release_date"` // ISO date string
-	Rating      float64   `json:"rating"`
-	Genre       []string  `json:"genre"`
-	Type        Type      `json:"type"`
-	Episodes    int       `json:"episodes"`
-	Description string    `json:"description"`
-	Studio      []string  `json:"studio"`
-	Duration    int       `json:"duration"` // in minutes
-	Status      Status    `json:"status"`
-	ESRB        ESRB      `json:"esrb"`
-	Logo        []string  `json:"logo"`
-	Media       []string  `json:"media"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"` // MongoDB ObjectID
+	Title       string             `bson:"title" json:"title"`
+	ReleaseDate time.Time          `bson:"release_date" json:"release_date"` // ISO date string
+	Rating      float64            `bson:"rating" json:"rating"`
+	Genre       []string           `bson:"genre" json:"genre"`
+	Type        Type               `bson:"type" json:"type"`
+	Episodes    int                `bson:"episodes" json:"episodes"`
+	Description string             `bson:"description" json:"description"`
+	Studio      []string           `bson:"studio" json:"studio"`
+	Duration    int                `bson:"duration" json:"duration"` // in minutes
+	Status      Status             `bson:"status" json:"status"`
+	ESRB        ESRB               `bson:"esrb" json:"esrb"`
+	Logo        []string           `bson:"logo" json:"logo"`
+	Media       []string           `bson:"media" json:"media"`
 }
 
 // Filters struct represents the filters used to search for anime
 type Filters struct {
-	Genre       []string `json:"genre"`
-	Studio      []string `json:"studio"`
-	ReleaseType Type     `json:"release_type"`
-	Status      Status   `json:"status"`
-	ESRB        ESRB     `json:"esrb"`
+	Genre       []string `bson:"genre" json:"genre"`
+	Studio      []string `bson:"studio" json:"studio"`
+	ReleaseType Type     `bson:"release_type" json:"release_type"`
+	Status      Status   `bson:"status" json:"status"`
+	ESRB        ESRB     `bson:"esrb" json:"esrb"`
 }
 
 // Character struct represents character information
 type Character struct {
-	ID        string   `json:"id"` // UUID format
-	FirstName string   `json:"first_name"`
-	LastName  string   `json:"last_name"`
-	Age       int      `json:"age"`
-	FromAnime []string `json:"from_anime"`
-	Gender    string   `json:"gender"`
-	Bio       string   `json:"bio"`
-	Status    string   `json:"status"` // e.g., "alive", "dead", "unknown"
-	Logo      []string `json:"logo"`
-	Media     []string `json:"media"`
+	ID        primitive.ObjectID `bson:"_id" json:"id"` // UUID format
+	FirstName string             `bson:"first_name" json:"first_name"`
+	LastName  string             `bson:"last_name" json:"last_name"`
+	Age       int                `bson:"age" json:"age"`
+	FromAnime []string           `bson:"from_anime" json:"from_anime"`
+	Gender    string             `bson:"gender" json:"gender"`
+	Bio       string             `bson:"bio" json:"bio"`
+	Status    string             `bson:"status" json:"status"` // e.g., "alive", "dead", "unknown"
+	Logo      []string           `bson:"logo" json:"logo"`
+	Media     []string           `bson:"media" json:"media"`
 }

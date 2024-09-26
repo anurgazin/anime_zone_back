@@ -1,13 +1,15 @@
-package funcs
+package routes
 
 import (
 	database "anime_zone/back_end/db"
+	"anime_zone/back_end/funcs"
 
 	// "fmt"
 	// "io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var characters = database.SampleCharacters
@@ -20,7 +22,7 @@ func GetCharactersById(g *gin.Context) {
 	id := g.Param("id")
 
 	for _, c := range characters {
-		if c.ID == id {
+		if primitive.ObjectID(c.ID).String() == id {
 			g.IndentedJSON(http.StatusOK, c)
 			return
 		}
@@ -37,7 +39,7 @@ func PostCharacters(g *gin.Context) {
 		return
 	}
 
-	if checkCharactersExistsById(newCharacter.ID) {
+	if funcs.CheckCharactersExistsById(primitive.ObjectID(newCharacter.ID).String()) {
 		// If such character exists, return an error message
 		g.JSON(http.StatusBadRequest, gin.H{"error": "Such Character already exists in our db: " + newCharacter.FirstName + " " + newCharacter.LastName})
 		return
@@ -45,7 +47,7 @@ func PostCharacters(g *gin.Context) {
 
 	// Check if all anime in FromAnime exist
 	for _, animeTitle := range newCharacter.FromAnime {
-		if !checkAnimeExistsByTitle(animeTitle) {
+		if !funcs.CheckAnimeExistsByTitle(animeTitle) {
 			// If any anime doesn't exist, return an error message
 			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeTitle})
 			return
@@ -71,7 +73,7 @@ func PutCharacters(g *gin.Context) {
 
 	// Check if all anime in FromAnime exist
 	for _, animeTitle := range updatedCharacter.FromAnime {
-		if !checkAnimeExistsByTitle(animeTitle) {
+		if !funcs.CheckAnimeExistsByTitle(animeTitle) {
 			// If any anime doesn't exist, return an error message
 			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeTitle})
 			return
@@ -79,7 +81,7 @@ func PutCharacters(g *gin.Context) {
 	}
 
 	for i, c := range characters {
-		if c.ID == id {
+		if primitive.ObjectID(c.ID).String() == id {
 			characters[i].FirstName = updatedCharacter.FirstName
 			characters[i].LastName = updatedCharacter.LastName
 			characters[i].Bio = updatedCharacter.Bio
@@ -88,7 +90,7 @@ func PutCharacters(g *gin.Context) {
 			characters[i].FromAnime = updatedCharacter.FromAnime
 			characters[i].Status = updatedCharacter.Status
 
-			g.JSON(http.StatusOK, gin.H{"message": "Character updated: " + c.ID})
+			g.JSON(http.StatusOK, gin.H{"message": "Character updated: " + primitive.ObjectID(c.ID).String()})
 			return
 		}
 	}
