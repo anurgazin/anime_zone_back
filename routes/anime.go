@@ -24,7 +24,7 @@ func GetAnimeById(c *gin.Context) {
 	anime, err := database.GetAnimeById(id)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, anime)
@@ -33,10 +33,10 @@ func GetAnimeById(c *gin.Context) {
 func GetAnimeByTitle(c *gin.Context) {
 	title := c.Param("title")
 
-	anime, err := database.GetAnimeById(title)
+	anime, err := database.GetAnimeByTitle(title)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, anime)
@@ -57,7 +57,7 @@ func PostAnime(c *gin.Context) {
 
 	insertedID, err := database.UploadAnime(newAnime)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, err)
+		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	result := fmt.Sprintf("Added next anime: %v", insertedID)
@@ -76,7 +76,7 @@ func PutAnime(c *gin.Context) {
 	result, err := database.UpdateAnime(id, updatedAnime)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 
