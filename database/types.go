@@ -71,4 +71,6 @@ type Character struct {
 	Gender    string   `json:"gender"`
 	Bio       string   `json:"bio"`
 	Status    string   `json:"status"` // e.g., "alive", "dead", "unknown"
+	Logo      []string `json:"logo"`
+	Media     []string `json:"media"`
 }
