@@ -9,17 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// func UploadAnime(anime Anime) {
-// 	client := RunMongo()
-// 	collection := client.Database("Anime-Zone").Collection("Anime")
-// 	insertResult, err := collection.InsertOne(context.TODO(), anime)
-// 	if err != nil {
-// 		fmt.Println(err)
-// 	}
-
-// 	fmt.Println("Inserted multiple documents: ", insertResult.InsertedID)
-// }
-
 func UploadAnime(anime Anime) (interface{}, error) {
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
@@ -96,9 +85,7 @@ func GetAnimeByTitle(title string) (*Anime, error) {
 	return &result, nil
 }
 
-// UpdateAnime updates an existing anime document by its ID with the new details provided in the Anime struct.
 func UpdateAnime(id string, updatedAnime Anime) (interface{}, error) {
-	// Connect to MongoDB
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
@@ -128,13 +115,11 @@ func UpdateAnime(id string, updatedAnime Anime) (interface{}, error) {
 		},
 	}
 
-	// Perform the update operation
 	result, err := collection.UpdateOne(context.TODO(), bson.M{"_id": objID}, update)
 	if err != nil {
 		return nil, fmt.Errorf("could not update anime: %w", err)
 	}
 
-	// Check if any document was updated
 	if result.MatchedCount == 0 {
 		return nil, fmt.Errorf("no anime found with the given ID")
 	}
