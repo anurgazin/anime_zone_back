@@ -1,7 +1,7 @@
 package funcs
 
 import (
-	"anime_zone/back_end/database"
+	database "anime_zone/back_end/db"
 
 	// "fmt"
 	// "io"
