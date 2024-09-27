@@ -15,19 +15,23 @@ import (
 var characters = database.SampleCharacters
 
 func GetCharacters(g *gin.Context) {
+	characters, err := database.GetAllCharacters()
+	if err != nil {
+		g.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve characters"})
+		return
+	}
 	g.IndentedJSON(http.StatusOK, characters)
 }
 
 func GetCharactersById(g *gin.Context) {
 	id := g.Param("id")
+	character, err := database.GetCharacterById(id)
 
-	for _, c := range characters {
-		if primitive.ObjectID(c.ID).String() == id {
-			g.IndentedJSON(http.StatusOK, c)
-			return
-		}
+	if err != nil {
+		g.IndentedJSON(http.StatusNotFound, gin.H{"message": "character not found"})
+		return
 	}
-	g.IndentedJSON(http.StatusNotFound, gin.H{"message": "character not found"})
+	g.IndentedJSON(http.StatusOK, character)
 }
 
 func PostCharacters(g *gin.Context) {
