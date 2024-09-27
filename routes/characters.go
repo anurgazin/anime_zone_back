@@ -3,6 +3,7 @@ package routes
 import (
 	database "anime_zone/back_end/db"
 	"anime_zone/back_end/funcs"
+	"fmt"
 
 	// "fmt"
 	// "io"
@@ -11,8 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-var characters = database.SampleCharacters
 
 func GetCharacters(g *gin.Context) {
 	characters, err := database.GetAllCharacters()
@@ -58,11 +57,13 @@ func PostCharacters(g *gin.Context) {
 		}
 	}
 
-	// If all anime exist, add the new character
-	characters = append(characters, newCharacter)
-
-	// Respond with the created character
-	g.IndentedJSON(http.StatusCreated, newCharacter)
+	insertedID, err := database.UploadCharacter(newCharacter)
+	if err != nil {
+		g.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	result := fmt.Sprintf("Added next character: %v", insertedID)
+	g.IndentedJSON(http.StatusCreated, result)
 }
 
 func PutCharacters(g *gin.Context) {
@@ -84,20 +85,12 @@ func PutCharacters(g *gin.Context) {
 		}
 	}
 
-	for i, c := range characters {
-		if primitive.ObjectID(c.ID).String() == id {
-			characters[i].FirstName = updatedCharacter.FirstName
-			characters[i].LastName = updatedCharacter.LastName
-			characters[i].Bio = updatedCharacter.Bio
-			characters[i].Age = updatedCharacter.Age
-			characters[i].Gender = updatedCharacter.Gender
-			characters[i].FromAnime = updatedCharacter.FromAnime
-			characters[i].Status = updatedCharacter.Status
+	result, err := database.UpdateCharacter(id, updatedCharacter)
 
-			g.JSON(http.StatusOK, gin.H{"message": "Character updated: " + primitive.ObjectID(c.ID).String()})
-			return
-		}
+	if err != nil {
+		g.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
 	}
 
-	g.IndentedJSON(http.StatusNotFound, gin.H{"message": "Such Character not found: " + updatedCharacter.FirstName + " " + updatedCharacter.LastName})
+	g.IndentedJSON(http.StatusNotFound, gin.H{"message": result})
 }
