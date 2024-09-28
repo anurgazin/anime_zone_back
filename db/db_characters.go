@@ -103,3 +103,28 @@ func UpdateCharacter(id string, updatedCharacter Character) (interface{}, error)
 	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
 	return result, nil
 }
+
+func DeleteCharacter(id string) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Characters")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+	result, err := collection.DeleteOne(context.TODO(), filter)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not delete character: %w", err)
+	}
+
+	if result.DeletedCount == 0 {
+		return nil, fmt.Errorf("no character found with the given ID")
+	}
+
+	fmt.Printf("Successfully updated %v document(s)\n", result.DeletedCount)
+	return result, nil
+}

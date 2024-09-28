@@ -94,3 +94,14 @@ func PutCharacters(g *gin.Context) {
 
 	g.IndentedJSON(http.StatusNotFound, gin.H{"message": result})
 }
+
+func DeleteCharacter(g *gin.Context) {
+	id := g.Param("id")
+	character, err := database.DeleteCharacter(id)
+
+	if err != nil {
+		g.IndentedJSON(http.StatusNotFound, gin.H{"message": err})
+		return
+	}
+	g.IndentedJSON(http.StatusOK, character)
+}
