@@ -29,6 +29,7 @@ func main() {
 	router.GET("/characters/:id", routes.GetCharactersById)
 	router.POST("/characters", routes.PostCharacters)
 	router.PUT("/characters/:id", routes.PutCharacters)
+	router.DELETE("/characters/:id", routes.DeleteCharacter)
 
 	router.Run("localhost:8080")
 }
