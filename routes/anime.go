@@ -2,7 +2,6 @@ package routes
 
 import (
 	database "anime_zone/back_end/db"
-	"anime_zone/back_end/funcs"
 	"fmt"
 	"net/http"
 
@@ -49,11 +48,11 @@ func PostAnime(c *gin.Context) {
 		return
 	}
 
-	if funcs.CheckAnimeExistsById(newAnime.ID.Hex()) {
-		// If any anime exists, return an error message
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Such Anime already exists in our db: " + newAnime.Title})
-		return
-	}
+	// if funcs.CheckAnimeExistsById(newAnime.ID.Hex()) {
+	// 	// If any anime exists, return an error message
+	// 	c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Such Anime already exists in our db: " + newAnime.Title})
+	// 	return
+	// }
 
 	insertedID, err := database.UploadAnime(newAnime)
 	if err != nil {
@@ -81,4 +80,15 @@ func PutAnime(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
+}
+
+func DeleteAnime(c *gin.Context) {
+	id := c.Param("id")
+	anime, err := database.DeleteAnime(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, anime)
 }

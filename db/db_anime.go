@@ -12,6 +12,7 @@ import (
 func UploadAnime(anime Anime) (interface{}, error) {
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
+	anime.ID = primitive.NewObjectID()
 	insertResult, err := collection.InsertOne(context.TODO(), anime)
 	if err != nil {
 		fmt.Println(err)
@@ -76,7 +77,7 @@ func GetAnimeByTitle(title string) (*Anime, error) {
 
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return nil, fmt.Errorf("No anime found with the given title")
+			return nil, fmt.Errorf("no anime found with the given title")
 		}
 		return nil, fmt.Errorf("error finding anime: %w", err)
 	}
@@ -126,4 +127,42 @@ func UpdateAnime(id string, updatedAnime Anime) (interface{}, error) {
 
 	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
 	return result, nil
+}
+
+func DeleteAnime(id string) (interface{}, error) {
+	client := RunMongo()
+	anime_collection := client.Database("Anime-Zone").Collection("Anime")
+	character_collection := client.Database("Anime-Zone").Collection("Characters")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+	anime_result, err := anime_collection.DeleteOne(context.TODO(), filter)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not delete anime: %w", err)
+	}
+
+	if anime_result.DeletedCount == 0 {
+		return nil, fmt.Errorf("no anime found with the given ID")
+	}
+
+	// Delete characters where `from_anime` contains the anime ID
+	character_filter := bson.M{"from_anime": bson.M{"$in": []primitive.ObjectID{objID}}}
+	character_result, err := character_collection.DeleteMany(context.TODO(), character_filter)
+	if err != nil {
+		return nil, fmt.Errorf("could not delete characters: %w", err)
+	}
+
+	fmt.Printf("Successfully deleted %v anime document(s)\n", anime_result.DeletedCount)
+	fmt.Printf("Successfully deleted %v character document(s)\n", character_result.DeletedCount)
+
+	return map[string]interface{}{
+		"deleted_anime_count":     anime_result.DeletedCount,
+		"deleted_character_count": character_result.DeletedCount,
+	}, nil
 }
