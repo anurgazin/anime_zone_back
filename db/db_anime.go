@@ -152,8 +152,8 @@ func DeleteAnime(id string) (interface{}, error) {
 	}
 
 	// Delete characters where `from_anime` contains the anime ID
-	characterFilter := bson.M{"from_anime": bson.M{"$in": []primitive.ObjectID{objID}}}
-	character_result, err := character_collection.DeleteMany(context.TODO(), characterFilter)
+	character_filter := bson.M{"from_anime": bson.M{"$in": []primitive.ObjectID{objID}}}
+	character_result, err := character_collection.DeleteMany(context.TODO(), character_filter)
 	if err != nil {
 		return nil, fmt.Errorf("could not delete characters: %w", err)
 	}
