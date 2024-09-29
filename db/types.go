@@ -69,14 +69,14 @@ type Filters struct {
 
 // Character struct represents character information
 type Character struct {
-	ID        primitive.ObjectID `bson:"_id" json:"id"` // UUID format
-	FirstName string             `bson:"first_name" json:"first_name"`
-	LastName  string             `bson:"last_name" json:"last_name"`
-	Age       int                `bson:"age" json:"age"`
-	FromAnime []string           `bson:"from_anime" json:"from_anime"`
-	Gender    string             `bson:"gender" json:"gender"`
-	Bio       string             `bson:"bio" json:"bio"`
-	Status    string             `bson:"status" json:"status"` // e.g., "alive", "dead", "unknown"
-	Logo      []string           `bson:"logo" json:"logo"`
-	Media     []string           `bson:"media" json:"media"`
+	ID        primitive.ObjectID   `bson:"_id" json:"id"` // UUID format
+	FirstName string               `bson:"first_name" json:"first_name"`
+	LastName  string               `bson:"last_name" json:"last_name"`
+	Age       int                  `bson:"age" json:"age"`
+	FromAnime []primitive.ObjectID `bson:"from_anime" json:"from_anime"`
+	Gender    string               `bson:"gender" json:"gender"`
+	Bio       string               `bson:"bio" json:"bio"`
+	Status    string               `bson:"status" json:"status"` // e.g., "alive", "dead", "unknown"
+	Logo      []string             `bson:"logo" json:"logo"`
+	Media     []string             `bson:"media" json:"media"`
 }

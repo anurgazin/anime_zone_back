@@ -49,10 +49,10 @@ func PostCharacters(g *gin.Context) {
 	}
 
 	// Check if all anime in FromAnime exist
-	for _, animeTitle := range newCharacter.FromAnime {
-		if !funcs.CheckAnimeExistsByTitle(animeTitle) {
+	for _, animeId := range newCharacter.FromAnime {
+		if !funcs.CheckAnimeExistsById(animeId.Hex()) {
 			// If any anime doesn't exist, return an error message
-			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeTitle})
+			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeId.Hex()})
 			return
 		}
 	}
@@ -77,10 +77,10 @@ func PutCharacters(g *gin.Context) {
 	}
 
 	// Check if all anime in FromAnime exist
-	for _, animeTitle := range updatedCharacter.FromAnime {
-		if !funcs.CheckAnimeExistsByTitle(animeTitle) {
+	for _, animeId := range updatedCharacter.FromAnime {
+		if !funcs.CheckAnimeExistsById(animeId.Hex()) {
 			// If any anime doesn't exist, return an error message
-			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeTitle})
+			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeId.Hex()})
 			return
 		}
 	}
