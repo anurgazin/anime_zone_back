@@ -24,6 +24,7 @@ func main() {
 	router.GET("/anime/title/:title", routes.GetAnimeByTitle)
 	router.POST("/anime", routes.PostAnime)
 	router.PUT("/anime/:id", routes.PutAnime)
+	router.DELETE("/anime/:id", routes.DeleteAnime)
 
 	router.GET("/characters", routes.GetCharacters)
 	router.GET("/characters/:id", routes.GetCharactersById)
