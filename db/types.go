@@ -80,3 +80,14 @@ type Character struct {
 	Logo      []string             `bson:"logo" json:"logo"`
 	Media     []string             `bson:"media" json:"media"`
 }
+
+// Character struct represents character information
+type User struct {
+	ID       primitive.ObjectID `bson:"_id" json:"id"` // UUID format
+	Email    string             `bson:"email" json:"email"`
+	Username string             `bson:"username" json:"username"`
+	Password string             `bson:"password" json:"password"`
+	Role     string             `bson:"role" json:"role"`
+	Bio      string             `bson:"bio" json:"bio"`
+	Logo     []string           `bson:"logo" json:"logo"`
+}
