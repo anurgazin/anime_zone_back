@@ -19,6 +19,8 @@ func main() {
 	router := gin.Default()
 	router.GET("/", getDefault)
 
+	router.POST("/register", routes.Registration)
+
 	router.GET("/anime", routes.GetAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)
 	router.GET("/anime/title/:title", routes.GetAnimeByTitle)

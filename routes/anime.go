@@ -48,12 +48,6 @@ func PostAnime(c *gin.Context) {
 		return
 	}
 
-	// if funcs.CheckAnimeExistsById(newAnime.ID.Hex()) {
-	// 	// If any anime exists, return an error message
-	// 	c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Such Anime already exists in our db: " + newAnime.Title})
-	// 	return
-	// }
-
 	insertedID, err := database.UploadAnime(newAnime)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
