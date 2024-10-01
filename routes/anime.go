@@ -45,6 +45,7 @@ func PostAnime(c *gin.Context) {
 	var newAnime database.Anime
 
 	if err := c.BindJSON(&newAnime); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid anime data"})
 		return
 	}
 
@@ -63,6 +64,7 @@ func PutAnime(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := c.BindJSON(&updatedAnime); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid anime data"})
 		return
 	}
 
