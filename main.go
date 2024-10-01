@@ -20,6 +20,7 @@ func main() {
 	router.GET("/", getDefault)
 
 	router.POST("/register", routes.Registration)
+	router.POST("/login", routes.Login)
 
 	router.GET("/anime", routes.GetAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)
