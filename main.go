@@ -21,6 +21,7 @@ func main() {
 
 	router.POST("/register", routes.Registration)
 	router.POST("/login", routes.Login)
+	router.PUT("/user/:id", routes.PutUser)
 
 	router.GET("/anime", routes.GetAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)

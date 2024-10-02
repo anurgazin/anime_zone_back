@@ -26,7 +26,7 @@ func Registration(c *gin.Context) {
 }
 
 type LoginRequest struct {
-	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -36,10 +36,30 @@ func Login(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	result, err := database.LoginUser(loginRequest.Username, loginRequest.Password)
+	result, err := database.LoginUser(loginRequest.Email, loginRequest.Password)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 	c.IndentedJSON(http.StatusCreated, result)
+}
+
+func PutUser(c *gin.Context) {
+	var updatedUser database.User
+
+	id := c.Param("id")
+
+	if err := c.BindJSON(&updatedUser); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid user data"})
+		return
+	}
+
+	result, err := database.EditUser(id, updatedUser)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }

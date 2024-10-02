@@ -43,10 +43,10 @@ func RegisterUser(user User) (interface{}, error) {
 	return insertResult.InsertedID, nil
 }
 
-func LoginUser(username string, password string) (interface{}, error) {
+func LoginUser(email string, password string) (interface{}, error) {
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Users")
-	filter := bson.M{"username": username}
+	filter := bson.M{"email": email}
 
 	var result User
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
@@ -61,5 +61,43 @@ func LoginUser(username string, password string) (interface{}, error) {
 		return nil, fmt.Errorf("incorrect Password")
 	}
 
+	return result, nil
+}
+
+func EditUser(id string, updatedUser User) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Users")
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+	pwd := updatedUser.Password
+	password, err := HashPassword(pwd)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	updatedUser.Password = password
+
+	update := bson.M{
+		"$set": bson.M{
+			"username": updatedUser.Username,
+			"bio":      updatedUser.Bio,
+			"logo":     updatedUser.Logo,
+			"password": updatedUser.Password,
+		},
+	}
+
+	result, err := collection.UpdateOne(context.TODO(), bson.M{"_id": objID}, update)
+	if err != nil {
+		return nil, fmt.Errorf("could not edit user: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("no users found with the given ID")
+	}
+
+	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
 	return result, nil
 }
