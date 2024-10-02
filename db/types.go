@@ -69,7 +69,7 @@ type Filters struct {
 
 // Character struct represents character information
 type Character struct {
-	ID        primitive.ObjectID   `bson:"_id" json:"id"` // UUID format
+	ID        primitive.ObjectID   `bson:"_id" json:"id"`
 	FirstName string               `bson:"first_name" json:"first_name"`
 	LastName  string               `bson:"last_name" json:"last_name"`
 	Age       int                  `bson:"age" json:"age"`
@@ -83,11 +83,26 @@ type Character struct {
 
 // Character struct represents character information
 type User struct {
-	ID       primitive.ObjectID `bson:"_id" json:"id"` // UUID format
+	ID       primitive.ObjectID `bson:"_id" json:"id"`
 	Email    string             `bson:"email" json:"email"`
 	Username string             `bson:"username" json:"username"`
 	Password string             `bson:"password" json:"password"`
 	Role     string             `bson:"role" json:"role"`
 	Bio      string             `bson:"bio" json:"bio"`
 	Logo     []string           `bson:"logo" json:"logo"`
+}
+
+type AnimeList struct {
+	ID        primitive.ObjectID   `bson:"_id" json:"id"`
+	Name      string               `bson:"name" json:"name"`
+	UserID    primitive.ObjectID   `bson:"user_id" json:"user_id"`
+	AnimeList []primitive.ObjectID `bson:"anime_list" json:"anime_list"`
+	Rating    float64              `bson:"rating" json:"rating"`
+}
+type CharacterList struct {
+	ID            primitive.ObjectID   `bson:"_id" json:"id"`
+	Name          string               `bson:"name" json:"name"`
+	UserID        primitive.ObjectID   `bson:"user_id" json:"user_id"`
+	CharacterList []primitive.ObjectID `bson:"anime_list" json:"anime_list"`
+	Rating        float64              `bson:"rating" json:"rating"`
 }
