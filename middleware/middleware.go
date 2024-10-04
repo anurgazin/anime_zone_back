@@ -6,10 +6,11 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	jwt_lib "github.com/golang-jwt/jwt/v5"
 )
 
 func AuthToken(c *gin.Context) {
-	tokenString := c.GetHeader("token")
+	tokenString := c.GetHeader("Auth")
 	if tokenString == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Token is missing"})
 		c.Redirect(http.StatusSeeOther, "/login")
@@ -17,7 +18,6 @@ func AuthToken(c *gin.Context) {
 		return
 	}
 
-	// Verify the token
 	token, err := jwt.VerifyToken(tokenString)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err})
@@ -28,5 +28,30 @@ func AuthToken(c *gin.Context) {
 
 	fmt.Printf("Token verified successfully. Claims: %+v\\n", token.Claims)
 
+	c.Set("token", token)
+	c.Set("claims", token.Claims)
+	c.Next()
+}
+
+func IsAdmin(c *gin.Context) {
+	claims, exists := c.Get("claims")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "Token not found"})
+		c.Abort()
+		return
+	}
+
+	role, ok := claims.(jwt_lib.MapClaims)["role"].(string)
+
+	if !ok {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+		c.Abort()
+		return
+	}
+	if role != "admin" {
+		c.IndentedJSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+		c.Abort()
+		return
+	}
 	c.Next()
 }
