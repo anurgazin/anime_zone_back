@@ -10,38 +10,38 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var secret = []byte(funcs.GoDotEnvVariable("JWT_SECRET"))
+
 // Function to create JWT tokens with claims
 func CreateToken(user database.User) (string, error) {
-	// Create a new JWT token with claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username, // Subject (user identifier)
+		"username": user.Username,
 		"id":       user.ID,
 		"role":     user.Role,
 		"exp":      time.Now().Add(time.Hour).Unix(), // Expiration time
 		"iat":      time.Now().Unix(),                // Issued at
 	})
 
-	// Print information about the created token
-	fmt.Printf("Token claims added: %+v\n", token)
-	tokenString, err := token.SignedString(funcs.GoDotEnvVariable("JWT_SECRET"))
+	tokenString, err := token.SignedString(secret)
 	if err != nil {
 		return "", err
 	}
 	return tokenString, nil
 }
 
-func VerifyToken(tokenString string) error {
+// Function to verify JWT tokens
+func VerifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return funcs.GoDotEnvVariable("JWT_SECRET"), nil
+		return secret, nil
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("invalid token")
+		return nil, fmt.Errorf("invalid token")
 	}
 
-	return nil
+	return token, nil
 }
