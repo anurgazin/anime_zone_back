@@ -24,18 +24,18 @@ func main() {
 	router.POST("/login", routes.Login)
 	router.PUT("/user/:id", middleware.AuthToken, routes.PutUser)
 
-	router.GET("/anime", middleware.AuthToken, routes.GetAnime)
+	router.GET("/anime", routes.GetAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)
 	router.GET("/anime/title/:title", routes.GetAnimeByTitle)
-	router.POST("/anime", middleware.AuthToken, routes.PostAnime)
-	router.PUT("/anime/:id", middleware.AuthToken, routes.PutAnime)
-	router.DELETE("/anime/:id", middleware.AuthToken, routes.DeleteAnime)
+	router.POST("/anime", middleware.AuthToken, middleware.IsAdmin, routes.PostAnime)
+	router.PUT("/anime/:id", middleware.AuthToken, middleware.IsAdmin, routes.PutAnime)
+	router.DELETE("/anime/:id", middleware.AuthToken, middleware.IsAdmin, routes.DeleteAnime)
 
 	router.GET("/characters", routes.GetCharacters)
 	router.GET("/characters/:id", routes.GetCharactersById)
-	router.POST("/characters", routes.PostCharacters)
-	router.PUT("/characters/:id", routes.PutCharacters)
-	router.DELETE("/characters/:id", routes.DeleteCharacter)
+	router.POST("/characters", middleware.AuthToken, middleware.IsAdmin, routes.PostCharacters)
+	router.PUT("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.PutCharacters)
+	router.DELETE("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.DeleteCharacter)
 
 	router.Run("localhost:8080")
 }
