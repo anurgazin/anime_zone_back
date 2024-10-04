@@ -2,6 +2,7 @@ package routes
 
 import (
 	database "anime_zone/back_end/db"
+	"anime_zone/back_end/jwt"
 	"fmt"
 	"net/http"
 
@@ -41,7 +42,12 @@ func Login(c *gin.Context) {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, result)
+	userToken, err := jwt.CreateToken(result.(database.User))
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, gin.H{"token": userToken})
 }
 
 func PutUser(c *gin.Context) {

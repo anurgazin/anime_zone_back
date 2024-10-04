@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	database "anime_zone/back_end/db"
+	"anime_zone/back_end/middleware"
 	"anime_zone/back_end/routes"
 )
 
@@ -21,14 +22,14 @@ func main() {
 
 	router.POST("/register", routes.Registration)
 	router.POST("/login", routes.Login)
-	router.PUT("/user/:id", routes.PutUser)
+	router.PUT("/user/:id", middleware.AuthToken, routes.PutUser)
 
-	router.GET("/anime", routes.GetAnime)
+	router.GET("/anime", middleware.AuthToken, routes.GetAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)
 	router.GET("/anime/title/:title", routes.GetAnimeByTitle)
-	router.POST("/anime", routes.PostAnime)
-	router.PUT("/anime/:id", routes.PutAnime)
-	router.DELETE("/anime/:id", routes.DeleteAnime)
+	router.POST("/anime", middleware.AuthToken, routes.PostAnime)
+	router.PUT("/anime/:id", middleware.AuthToken, routes.PutAnime)
+	router.DELETE("/anime/:id", middleware.AuthToken, routes.DeleteAnime)
 
 	router.GET("/characters", routes.GetCharacters)
 	router.GET("/characters/:id", routes.GetCharactersById)
