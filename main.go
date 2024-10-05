@@ -38,6 +38,7 @@ func main() {
 	router.DELETE("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.DeleteCharacter)
 
 	router.POST("/list/anime", middleware.AuthToken, routes.PostAnimeList)
+	router.POST("/list/characters", middleware.AuthToken, routes.PostCharacterList)
 
 	router.Run("localhost:8080")
 }
