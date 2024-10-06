@@ -103,6 +103,6 @@ type CharacterList struct {
 	ID            primitive.ObjectID   `bson:"_id" json:"id"`
 	Name          string               `bson:"name" json:"name"`
 	UserID        primitive.ObjectID   `bson:"user_id" json:"user_id"`
-	CharacterList []primitive.ObjectID `bson:"anime_list" json:"anime_list"`
+	CharacterList []primitive.ObjectID `bson:"character_list" json:"character_list"`
 	Rating        float64              `bson:"rating" json:"rating"`
 }

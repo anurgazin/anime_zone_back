@@ -80,7 +80,7 @@ func AddAnimeToList(c *gin.Context) {
 	}
 	lID := c.Param("id")
 	if lID == "" {
-		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "List Id not found"})
 		c.Abort()
 		return
 	}
@@ -93,6 +93,39 @@ func AddAnimeToList(c *gin.Context) {
 	newAnimeList.ListID = lID
 
 	result, err := database.AddAnimeToList(newAnimeList.ListID, newAnimeList.UserID, newAnimeList.ObjectID)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
+}
+
+func AddCharacterToList(c *gin.Context) {
+	var newCharacterList AddToListRequest
+
+	uID, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+	lID := c.Param("id")
+	if lID == "" {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "List Id not found"})
+		c.Abort()
+		return
+	}
+
+	if err := c.BindJSON(&newCharacterList); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid anime list title"})
+		return
+	}
+	newCharacterList.UserID = uID.(string)
+	newCharacterList.ListID = lID
+
+	result, err := database.AddCharacterToList(newCharacterList.ListID, newCharacterList.UserID, newCharacterList.ObjectID)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})

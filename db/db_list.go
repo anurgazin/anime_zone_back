@@ -57,12 +57,12 @@ func AddAnimeToList(listId string, userId string, animeId string) (interface{}, 
 
 	uID, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
-		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+		return nil, fmt.Errorf("invalid ObjectID format (UserId): %w", err)
 	}
 
 	lID, err := primitive.ObjectIDFromHex(listId)
 	if err != nil {
-		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+		return nil, fmt.Errorf("invalid ObjectID format (ListId): %w", err)
 	}
 
 	filter := bson.M{"_id": lID, "user_id": uID}
@@ -93,6 +93,52 @@ func AddAnimeToList(listId string, userId string, animeId string) (interface{}, 
 	}
 
 	fmt.Printf("Successfully updated list with anime ID %v\n", animeId)
+	return result, nil
+
+}
+
+func AddCharacterToList(listId string, userId string, characterId string) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("CharacterList")
+
+	uID, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format (UserId): %w", err)
+	}
+
+	lID, err := primitive.ObjectIDFromHex(listId)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format (ListId): %w", err)
+	}
+
+	filter := bson.M{"_id": lID, "user_id": uID}
+	var characterList CharacterList
+	err = collection.FindOne(context.TODO(), filter).Decode(&characterList)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("list not found or user is not the creator")
+		}
+		return nil, fmt.Errorf("could not retrieve the list: %w", err)
+	}
+
+	found, err := GetCharacterById(characterId)
+	if err != nil {
+		return nil, err
+	}
+
+	update := bson.M{
+		"$addToSet": bson.M{"character_list": found.ID},
+	}
+	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return nil, fmt.Errorf("could not update the list: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("no list found to update")
+	}
+
+	fmt.Printf("Successfully updated list with character ID %v\n", characterId)
 	return result, nil
 
 }
