@@ -2,15 +2,10 @@ package routes
 
 import (
 	database "anime_zone/back_end/db"
-	// "anime_zone/back_end/funcs"
 	"fmt"
-
-	// "fmt"
-	// "io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	// "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type PostListRequest struct {
@@ -66,4 +61,43 @@ func PostCharacterList(c *gin.Context) {
 	}
 	result := fmt.Sprintf("Next Character List Created: %v", insertedID)
 	c.IndentedJSON(http.StatusCreated, result)
+}
+
+type AddToListRequest struct {
+	ListID   string `json:"list_id"`
+	UserID   string `json:"user_id"`
+	ObjectID string `json:"object_id"`
+}
+
+func AddAnimeToList(c *gin.Context) {
+	var newAnimeList AddToListRequest
+
+	uID, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+	lID := c.Param("id")
+	if lID == "" {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+
+	if err := c.BindJSON(&newAnimeList); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid anime list title"})
+		return
+	}
+	newAnimeList.UserID = uID.(string)
+	newAnimeList.ListID = lID
+
+	result, err := database.AddAnimeToList(newAnimeList.ListID, newAnimeList.UserID, newAnimeList.ObjectID)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }
