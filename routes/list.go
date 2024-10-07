@@ -134,3 +134,12 @@ func AddCharacterToList(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }
+
+func GetAnimeLists(c *gin.Context) {
+	animeList, err := database.GetAllAnimeLists()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime lists"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, animeList)
+}

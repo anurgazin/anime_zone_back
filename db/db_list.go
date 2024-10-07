@@ -142,3 +142,22 @@ func AddCharacterToList(listId string, userId string, characterId string) (inter
 	return result, nil
 
 }
+
+func GetAllAnimeLists() ([]AnimeList, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("AnimeList")
+
+	cursor, err := collection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		panic(err)
+	}
+
+	var result []AnimeList
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all anime lists")
+	return result, nil
+}
