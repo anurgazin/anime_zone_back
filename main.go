@@ -37,6 +37,7 @@ func main() {
 	router.PUT("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.PutCharacters)
 	router.DELETE("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.DeleteCharacter)
 
+	router.GET("/list/anime", routes.GetAnimeLists)
 	router.POST("/list/anime", middleware.AuthToken, routes.PostAnimeList)
 	router.POST("/list/characters", middleware.AuthToken, routes.PostCharacterList)
 	router.PATCH("/list/anime/:id", middleware.AuthToken, routes.AddAnimeToList)
