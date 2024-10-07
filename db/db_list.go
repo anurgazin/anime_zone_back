@@ -161,3 +161,22 @@ func GetAllAnimeLists() ([]AnimeList, error) {
 	fmt.Println("Retrieved all anime lists")
 	return result, nil
 }
+
+func GetAllCharacterLists() ([]CharacterList, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("CharacterList")
+
+	cursor, err := collection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		panic(err)
+	}
+
+	var result []CharacterList
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all character lists")
+	return result, nil
+}
