@@ -156,11 +156,23 @@ func GetCharacterLists(c *gin.Context) {
 func GetAnimeListById(c *gin.Context) {
 	id := c.Param("id")
 
-	anime, err := database.GetAnimeListById(id)
+	animeList, err := database.GetAnimeListById(id)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, anime)
+	c.IndentedJSON(http.StatusOK, animeList)
+}
+
+func GetCharacterListById(c *gin.Context) {
+	id := c.Param("id")
+
+	characterList, err := database.GetCharacterListById(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, characterList)
 }

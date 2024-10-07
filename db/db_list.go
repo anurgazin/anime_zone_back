@@ -205,3 +205,28 @@ func GetAnimeListById(id string) (*AnimeList, error) {
 	// Return the found anime list
 	return &result, nil
 }
+
+func GetCharacterListById(id string) (*CharacterList, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("CharacterList")
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+
+	var result CharacterList
+	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no character list found with the given ID")
+		}
+		return nil, fmt.Errorf("error finding character list: %w", err)
+	}
+
+	// Return the found character list
+	return &result, nil
+}
