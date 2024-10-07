@@ -180,3 +180,28 @@ func GetAllCharacterLists() ([]CharacterList, error) {
 	fmt.Println("Retrieved all character lists")
 	return result, nil
 }
+
+func GetAnimeListById(id string) (*AnimeList, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("AnimeList")
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+
+	var result AnimeList
+	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no anime list found with the given ID")
+		}
+		return nil, fmt.Errorf("error finding anime list: %w", err)
+	}
+
+	// Return the found anime list
+	return &result, nil
+}
