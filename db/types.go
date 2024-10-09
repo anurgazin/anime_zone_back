@@ -1,6 +1,7 @@
 package database
 
 import (
+	"mime/multipart"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -40,22 +41,39 @@ const (
 	ESRBNone ESRB = "none"
 )
 
-// Define the Anime struct for BSON compatibility
+// Define the Anime struct for BSON compatibility and form binding
 type Anime struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"` // MongoDB ObjectID
-	Title       string             `bson:"title" json:"title"`
-	ReleaseDate time.Time          `bson:"release_date" json:"release_date"` // ISO date string
-	Rating      float64            `bson:"rating" json:"rating"`
-	Genre       []string           `bson:"genre" json:"genre"`
-	Type        Type               `bson:"type" json:"type"`
-	Episodes    int                `bson:"episodes" json:"episodes"`
-	Description string             `bson:"description" json:"description"`
-	Studio      []string           `bson:"studio" json:"studio"`
-	Duration    int                `bson:"duration" json:"duration"` // in minutes
-	Status      Status             `bson:"status" json:"status"`
-	ESRB        ESRB               `bson:"esrb" json:"esrb"`
-	Logo        string             `bson:"logo" json:"logo"`
-	Media       []string           `bson:"media" json:"media"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
+	Title       string             `bson:"title" json:"title" form:"title"`
+	ReleaseDate time.Time          `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
+	Rating      float64            `bson:"rating" json:"rating" form:"rating"`
+	Genre       []string           `bson:"genre" json:"genre" form:"genre"`
+	Type        Type               `bson:"type" json:"type" form:"type"`
+	Episodes    int                `bson:"episodes" json:"episodes" form:"episodes"`
+	Description string             `bson:"description" json:"description" form:"description"`
+	Studio      []string           `bson:"studio" json:"studio" form:"studio"`
+	Duration    int                `bson:"duration" json:"duration" form:"duration"` // in minutes
+	Status      Status             `bson:"status" json:"status" form:"status"`
+	ESRB        ESRB               `bson:"esrb" json:"esrb" form:"esrb"`
+	Logo        string             `bson:"logo" json:"logo" form:"logo"`
+	Media       []string           `bson:"media" json:"media" form:"media"`
+}
+
+type AnimeUploader struct {
+	ID          primitive.ObjectID    `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
+	Title       string                `bson:"title" json:"title" form:"title"`
+	ReleaseDate time.Time             `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
+	Rating      float64               `bson:"rating" json:"rating" form:"rating"`
+	Genre       []string              `bson:"genre" json:"genre" form:"genre"`
+	Type        Type                  `bson:"type" json:"type" form:"type"`
+	Episodes    int                   `bson:"episodes" json:"episodes" form:"episodes"`
+	Description string                `bson:"description" json:"description" form:"description"`
+	Studio      []string              `bson:"studio" json:"studio" form:"studio"`
+	Duration    int                   `bson:"duration" json:"duration" form:"duration"` // in minutes
+	Status      Status                `bson:"status" json:"status" form:"status"`
+	ESRB        ESRB                  `bson:"esrb" json:"esrb" form:"esrb"`
+	Logo        *multipart.FileHeader `bson:"logo" json:"logo" form:"logo"`
+	Media       []string              `bson:"media" json:"media" form:"media"`
 }
 
 // Filters struct represents the filters used to search for anime
