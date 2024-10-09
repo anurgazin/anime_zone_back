@@ -9,6 +9,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -68,33 +69,53 @@ func GetAnimeByTitle(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
+func handleImageUploader(file *multipart.FileHeader, title, suffix string) (string, error) {
+	fileParts := strings.Split(file.Filename, ".")
+	extension := fileParts[len(fileParts)-1]
+	fileName := strings.ReplaceAll(title, " ", "_") + suffix + "." + extension
+
+	byteContainer, err := ConvertFileHeaderToBytes(file)
+	if err != nil {
+		log.Println("ConvertFile error:")
+		log.Println(err.Error())
+		return "", err
+	}
+
+	fileUrl, err := azureblob.UploadFile(fileName, byteContainer)
+	if err != nil {
+		log.Println("UploadFile error:")
+		log.Println(err.Error())
+		return "", err
+	}
+	return fileUrl, nil
+}
+
 func PostAnime(c *gin.Context) {
 	var newAnime database.Anime
 	var newAnimeUploader database.AnimeUploader
 
-	if err := c.Bind(&newAnimeUploader); err != nil {
-		log.Println(err)
+	if err := c.ShouldBind(&newAnimeUploader); err != nil {
+		log.Println("Binding error:")
+		log.Println(err.Error())
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid anime data"})
 		return
 	}
 
-	log.Println(newAnimeUploader)
-	filename := strings.Split(newAnimeUploader.Logo.Filename, ".")
-	log.Println(filename[len(filename)-1])
-	logoFileName := strings.ReplaceAll(newAnimeUploader.Title, " ", "_") + "_Logo." + filename[len(filename)-1]
-
-	byteContainer, err := ConvertFileHeaderToBytes(newAnimeUploader.Logo)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to convert file"})
-		return
-	}
-
-	logoUrl, err := azureblob.UploadFile(logoFileName, byteContainer)
+	logoUrl, err := handleImageUploader(newAnimeUploader.Logo, newAnimeUploader.Title, "_Logo")
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	log.Println(logoUrl)
+
+	mediaURLs := []string{newAnimeUploader.Link}
+	for i := range newAnimeUploader.Media {
+		url, err := handleImageUploader(newAnimeUploader.Media[i], newAnimeUploader.Title, "_Media_"+strconv.Itoa(i+1))
+		if err != nil {
+			c.IndentedJSON(http.StatusBadRequest, err.Error())
+			return
+		}
+		mediaURLs = append(mediaURLs, url)
+	}
 
 	newAnime.Title = newAnimeUploader.Title
 	newAnime.ReleaseDate = newAnimeUploader.ReleaseDate
@@ -108,6 +129,7 @@ func PostAnime(c *gin.Context) {
 	newAnime.Status = newAnimeUploader.Status
 	newAnime.ESRB = newAnimeUploader.ESRB
 	newAnime.Logo = logoUrl
+	newAnime.Media = mediaURLs
 
 	insertedID, err := database.UploadAnime(newAnime)
 	if err != nil {

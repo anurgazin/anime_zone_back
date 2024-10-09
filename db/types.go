@@ -60,20 +60,21 @@ type Anime struct {
 }
 
 type AnimeUploader struct {
-	ID          primitive.ObjectID    `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
-	Title       string                `bson:"title" json:"title" form:"title"`
-	ReleaseDate time.Time             `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
-	Rating      float64               `bson:"rating" json:"rating" form:"rating"`
-	Genre       []string              `bson:"genre" json:"genre" form:"genre"`
-	Type        Type                  `bson:"type" json:"type" form:"type"`
-	Episodes    int                   `bson:"episodes" json:"episodes" form:"episodes"`
-	Description string                `bson:"description" json:"description" form:"description"`
-	Studio      []string              `bson:"studio" json:"studio" form:"studio"`
-	Duration    int                   `bson:"duration" json:"duration" form:"duration"` // in minutes
-	Status      Status                `bson:"status" json:"status" form:"status"`
-	ESRB        ESRB                  `bson:"esrb" json:"esrb" form:"esrb"`
-	Logo        *multipart.FileHeader `bson:"logo" json:"logo" form:"logo"`
-	Media       []string              `bson:"media" json:"media" form:"media"`
+	ID          primitive.ObjectID      `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
+	Title       string                  `bson:"title" json:"title" form:"title"`
+	ReleaseDate time.Time               `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
+	Rating      float64                 `bson:"rating" json:"rating" form:"rating"`
+	Genre       []string                `bson:"genre" json:"genre" form:"genre"`
+	Type        Type                    `bson:"type" json:"type" form:"type"`
+	Episodes    int                     `bson:"episodes" json:"episodes" form:"episodes"`
+	Description string                  `bson:"description" json:"description" form:"description"`
+	Studio      []string                `bson:"studio" json:"studio" form:"studio"`
+	Duration    int                     `bson:"duration" json:"duration" form:"duration"` // in minutes
+	Status      Status                  `bson:"status" json:"status" form:"status"`
+	ESRB        ESRB                    `bson:"esrb" json:"esrb" form:"esrb"`
+	Link        string                  `bson:"link" json:"link" form:"link"`
+	Logo        *multipart.FileHeader   `bson:"logo" json:"logo" form:"logo"`
+	Media       []*multipart.FileHeader `bson:"media" json:"media" form:"media"`
 }
 
 // Filters struct represents the filters used to search for anime
