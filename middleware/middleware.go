@@ -27,6 +27,7 @@ func AuthToken(c *gin.Context) {
 	}
 
 	fmt.Printf("Token verified successfully. Claims: %+v\\n", token.Claims)
+	fmt.Println()
 
 	c.Set("token", token)
 	c.Set("claims", token.Claims)
