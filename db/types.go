@@ -54,7 +54,7 @@ type Anime struct {
 	Duration    int                `bson:"duration" json:"duration"` // in minutes
 	Status      Status             `bson:"status" json:"status"`
 	ESRB        ESRB               `bson:"esrb" json:"esrb"`
-	Logo        []string           `bson:"logo" json:"logo"`
+	Logo        string             `bson:"logo" json:"logo"`
 	Media       []string           `bson:"media" json:"media"`
 }
 
@@ -77,7 +77,7 @@ type Character struct {
 	Gender    string               `bson:"gender" json:"gender"`
 	Bio       string               `bson:"bio" json:"bio"`
 	Status    string               `bson:"status" json:"status"` // e.g., "alive", "dead", "unknown"
-	Logo      []string             `bson:"logo" json:"logo"`
+	Logo      string               `bson:"logo" json:"logo"`
 	Media     []string             `bson:"media" json:"media"`
 }
 
@@ -89,7 +89,7 @@ type User struct {
 	Password string             `bson:"password" json:"password"`
 	Role     string             `bson:"role" json:"role"`
 	Bio      string             `bson:"bio" json:"bio"`
-	Logo     []string           `bson:"logo" json:"logo"`
+	Logo     string             `bson:"logo" json:"logo"`
 }
 
 type AnimeList struct {

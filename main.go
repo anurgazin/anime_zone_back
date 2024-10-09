@@ -46,5 +46,7 @@ func main() {
 	router.PATCH("/list/anime/:id", middleware.AuthToken, routes.AddAnimeToList)
 	router.PATCH("/list/characters/:id", middleware.AuthToken, routes.AddCharacterToList)
 
+	router.POST("/media", routes.CheckImage)
+
 	router.Run("localhost:8080")
 }
