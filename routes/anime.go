@@ -1,6 +1,7 @@
 package routes
 
 import (
+	azureblob "anime_zone/back_end/azure_blob"
 	database "anime_zone/back_end/db"
 	"fmt"
 	"net/http"
@@ -87,4 +88,36 @@ func DeleteAnime(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, anime)
+}
+
+// CheckImage handles file upload via multipart form data
+func CheckImage(c *gin.Context) {
+	// Retrieve the file from the form-data
+	file, header, err := c.Request.FormFile("new_image")
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Failed to upload image: " + err.Error()})
+		return
+	}
+	defer file.Close()
+
+	// Get the file name from the header
+	fileName := header.Filename
+
+	// Read the file content
+	fileBytes := make([]byte, header.Size)
+	_, err = file.Read(fileBytes)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file: " + err.Error()})
+		return
+	}
+
+	// Upload the file to Azure Blob Storage
+	fileURL, err := azureblob.UploadFile(fileName, fileBytes)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return the URL of the uploaded file
+	c.IndentedJSON(http.StatusOK, gin.H{"file_url": fileURL})
 }

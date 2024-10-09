@@ -13,6 +13,9 @@ func UploadAnime(anime Anime) (interface{}, error) {
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 	anime.ID = primitive.NewObjectID()
+	if anime.Media == nil {
+		anime.Media = []string{}
+	}
 	insertResult, err := collection.InsertOne(context.TODO(), anime)
 	if err != nil {
 		fmt.Println(err)
