@@ -4,6 +4,8 @@ import (
 	database "anime_zone/back_end/db"
 	"anime_zone/back_end/funcs"
 	"fmt"
+	"log"
+	"strconv"
 
 	// "fmt"
 	// "io"
@@ -35,26 +37,58 @@ func GetCharactersById(g *gin.Context) {
 
 func PostCharacters(g *gin.Context) {
 	var newCharacter database.Character
+	var newCharacterUploader database.CharacterUploader
 
-	// Bind the incoming JSON to the newCharacter struct
-	if err := g.BindJSON(&newCharacter); err != nil {
+	// Bind the incoming JSON to the newCharacterUploader struct
+	if err := g.ShouldBind(&newCharacterUploader); err != nil {
+		log.Println(err.Error())
 		g.JSON(http.StatusBadRequest, gin.H{"error": "Invalid character data"})
 		return
 	}
 
-	if funcs.CheckCharactersExistsById(primitive.ObjectID(newCharacter.ID).String()) {
-		// If such character exists, return an error message
-		g.JSON(http.StatusBadRequest, gin.H{"error": "Such Character already exists in our db: " + newCharacter.FirstName + " " + newCharacter.LastName})
+	// Check if all anime in FromAnime exist
+	var fromAnime = []primitive.ObjectID{}
+	for _, animeId := range newCharacterUploader.FromAnime {
+		if !funcs.CheckAnimeExistsById(animeId) {
+			// If any anime doesn't exist, return an error message
+			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeId})
+			return
+		}
+		id, err := primitive.ObjectIDFromHex(animeId)
+		if err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "invalid ObjectID format " + animeId})
+		}
+		fromAnime = append(fromAnime, id)
+	}
+
+	var title string = newCharacterUploader.FirstName + " " + newCharacterUploader.LastName
+
+	logoUrl, err := funcs.HandleImageUploader(newCharacterUploader.Logo, title, "_Logo")
+	if err != nil {
+		g.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Check if all anime in FromAnime exist
-	for _, animeId := range newCharacter.FromAnime {
-		if !funcs.CheckAnimeExistsById(animeId.Hex()) {
-			// If any anime doesn't exist, return an error message
-			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeId.Hex()})
+	mediaURLs := []string{}
+	for i := range newCharacterUploader.Media {
+		url, err := funcs.HandleImageUploader(newCharacterUploader.Media[i], title, "_Media_"+strconv.Itoa(i+1))
+		if err != nil {
+			g.IndentedJSON(http.StatusBadRequest, err.Error())
 			return
 		}
+		mediaURLs = append(mediaURLs, url)
+	}
+
+	newCharacter = database.Character{
+		FirstName: newCharacterUploader.FirstName,
+		LastName:  newCharacterUploader.LastName,
+		Age:       newCharacterUploader.Age,
+		FromAnime: fromAnime,
+		Gender:    newCharacterUploader.Gender,
+		Bio:       newCharacterUploader.Bio,
+		Status:    newCharacterUploader.Status,
+		Logo:      logoUrl,
+		Media:     mediaURLs,
 	}
 
 	insertedID, err := database.UploadCharacter(newCharacter)
