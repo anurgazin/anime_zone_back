@@ -2,6 +2,7 @@ package routes
 
 import (
 	database "anime_zone/back_end/db"
+	"anime_zone/back_end/funcs"
 	"anime_zone/back_end/jwt"
 	"fmt"
 	"net/http"
@@ -11,10 +12,24 @@ import (
 
 func Registration(c *gin.Context) {
 	var newUser database.User
+	var newUserUploader database.UserUploader
 
-	if err := c.BindJSON(&newUser); err != nil {
+	if err := c.ShouldBind(&newUserUploader); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
+	}
+	logoUrl, err := funcs.HandleImageUploader(newUserUploader.Logo, newUserUploader.Username, "_Logo")
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	newUser = database.User{
+		Email:    newUserUploader.Email,
+		Username: newUserUploader.Username,
+		Password: newUserUploader.Password,
+		Role:     newUserUploader.Role,
+		Bio:      newUserUploader.Bio,
+		Logo:     logoUrl,
 	}
 
 	insertedID, err := database.RegisterUser(newUser)
