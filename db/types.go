@@ -113,7 +113,7 @@ type CharacterUploader struct {
 	Media     []*multipart.FileHeader `bson:"media" json:"media" form:"media"`
 }
 
-// Character struct represents character information
+// User struct represents User information
 type User struct {
 	ID       primitive.ObjectID `bson:"_id" json:"id"`
 	Email    string             `bson:"email" json:"email"`
@@ -124,6 +124,18 @@ type User struct {
 	Logo     string             `bson:"logo" json:"logo"`
 }
 
+// User struct represents User information
+type UserUploader struct {
+	ID       primitive.ObjectID    `bson:"_id" json:"id" form:"id"`
+	Email    string                `bson:"email" json:"email" form:"email"`
+	Username string                `bson:"username" json:"username" form:"username"`
+	Password string                `bson:"password" json:"password" form:"password"`
+	Role     string                `bson:"role" json:"role" form:"role"`
+	Bio      string                `bson:"bio" json:"bio" form:"bio"`
+	Logo     *multipart.FileHeader `bson:"logo" json:"logo" form:"logo"`
+}
+
+// AnimeList struct represents AnimeList information
 type AnimeList struct {
 	ID        primitive.ObjectID   `bson:"_id" json:"id"`
 	Name      string               `bson:"name" json:"name"`
