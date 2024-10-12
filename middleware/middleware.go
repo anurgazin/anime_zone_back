@@ -32,6 +32,7 @@ func AuthToken(c *gin.Context) {
 	c.Set("token", token)
 	c.Set("claims", token.Claims)
 	c.Set("id", token.Claims.(jwt_lib.MapClaims)["id"].(string))
+	c.Set("username", token.Claims.(jwt_lib.MapClaims)["username"])
 	c.Next()
 }
 
