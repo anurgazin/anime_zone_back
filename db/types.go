@@ -143,10 +143,42 @@ type AnimeList struct {
 	AnimeList []primitive.ObjectID `bson:"anime_list" json:"anime_list"`
 	Rating    float64              `bson:"rating" json:"rating"`
 }
+
+// CharacterList struct represents CharacterList information
 type CharacterList struct {
 	ID            primitive.ObjectID   `bson:"_id" json:"id"`
 	Name          string               `bson:"name" json:"name"`
 	UserID        primitive.ObjectID   `bson:"user_id" json:"user_id"`
 	CharacterList []primitive.ObjectID `bson:"character_list" json:"character_list"`
 	Rating        float64              `bson:"rating" json:"rating"`
+}
+
+// CommentUser struct represents CommentUser information
+type CommentUser struct {
+	UserID   primitive.ObjectID `bson:"user_id" json:"user_id"`
+	Username string             `bson:"username" json:"username"`
+}
+type CommentType string
+
+// Define constants for Status
+const (
+	TypeAnime     CommentType = "anime"
+	TypeCharacter CommentType = "character"
+)
+
+// Comment struct represents Comment information
+type Comment struct {
+	ID        primitive.ObjectID `bson:"_id" json:"id"`
+	Type      CommentType        `bson:"type" json:"type"`
+	ContentID primitive.ObjectID `bson:"content_id" json:"content_id"`
+	User      CommentUser        `bson:"user" json:"user"`
+	Text      string             `bson:"text" json:"text"`
+	Rating    float64            `bson:"rating" json:"rating"`
+}
+type CommentUploader struct {
+	Type      CommentType `bson:"type" json:"type"`
+	ContentID string      `bson:"content_id" json:"content_id"`
+	User      CommentUser `bson:"user" json:"user"`
+	Text      string      `bson:"text" json:"text"`
+	Rating    float64     `bson:"rating" json:"rating"`
 }
