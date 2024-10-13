@@ -162,8 +162,10 @@ type CommentType string
 
 // Define constants for Status
 const (
-	TypeAnime     CommentType = "anime"
-	TypeCharacter CommentType = "character"
+	TypeAnime         CommentType = "anime"
+	TypeCharacter     CommentType = "character"
+	TypeAnimeList     CommentType = "anime_list"
+	TypeCharacterList CommentType = "character_list"
 )
 
 // Comment struct represents Comment information

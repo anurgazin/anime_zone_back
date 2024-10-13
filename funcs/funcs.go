@@ -119,3 +119,31 @@ func CheckCharactersExistsById(id string) bool {
 
 	return true
 }
+
+// Function to check if a character list exists by making a GET request to /list/characters/:id
+func CheckCharacterListExistsById(id string) bool {
+	// Make the GET request to the /anime/:title endpoint
+	url := "http://localhost:8080/list/characters/" + id
+	resp, err := http.Get(url)
+
+	// If there is an error or the status code is not 200 (OK), return false
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return false
+	}
+
+	return true
+}
+
+// Function to check if an anime list exists by making a GET request to /list/anime/:id
+func CheckAnimeListExistsById(id string) bool {
+	// Make the GET request to the /anime/:title endpoint
+	url := "http://localhost:8080/list/anime/" + id
+	resp, err := http.Get(url)
+
+	// If there is an error or the status code is not 200 (OK), return false
+	if err != nil || resp.StatusCode != http.StatusOK {
+		return false
+	}
+
+	return true
+}

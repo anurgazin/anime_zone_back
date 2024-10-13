@@ -48,7 +48,7 @@ func main() {
 
 	router.POST("/comment", middleware.AuthToken, routes.PostComment)
 	router.GET("/comment", routes.GetAllComments)
-	router.GET("/comment/:type", routes.GetCommentByType)
+	router.GET("/comment/type/:type", routes.GetCommentByType)
 
 	router.Run("localhost:8080")
 }
