@@ -51,6 +51,20 @@ func PostComment(c *gin.Context) {
 			return
 		}
 	}
+	if newCommentUploader.Type == "anime_list" {
+		if !funcs.CheckAnimeListExistsById(newCommentUploader.ContentID) {
+			// If any anime doesn't exist, return an error message
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime List doesn't exist in our db: " + newCommentUploader.ContentID})
+			return
+		}
+	}
+	if newCommentUploader.Type == "character_list" {
+		if !funcs.CheckCharacterListExistsById(newCommentUploader.ContentID) {
+			// If any anime doesn't exist, return an error message
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Such Character List doesn't exist in our db: " + newCommentUploader.ContentID})
+			return
+		}
+	}
 	var commentUser = database.CommentUser{
 		UserID:   userId,
 		Username: username.(string),
