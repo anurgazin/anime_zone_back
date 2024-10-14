@@ -175,6 +175,7 @@ type Comment struct {
 	ContentID primitive.ObjectID `bson:"content_id" json:"content_id"`
 	User      CommentUser        `bson:"user" json:"user"`
 	Text      string             `bson:"text" json:"text"`
+	Timestamp time.Time          `bson:"timestamp" json:"timestamp" form:"timestamp"`
 	Rating    float64            `bson:"rating" json:"rating"`
 }
 type CommentUploader struct {
