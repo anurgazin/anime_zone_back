@@ -111,3 +111,39 @@ func GetCommentByType(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, comment)
 }
+
+func GetCommentById(c *gin.Context) {
+	id := c.Param("id")
+
+	comment, err := database.GetCommentById(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, comment)
+}
+
+func DeleteComment(c *gin.Context) {
+	id := c.Param("id")
+	role, exists := c.Get("role")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Role not found"})
+		c.Abort()
+		return
+	}
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+
+	result, err := database.DeleteComment(id, user_id.(string), role.(string))
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, result)
+}
