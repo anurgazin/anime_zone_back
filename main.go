@@ -46,9 +46,11 @@ func main() {
 	router.PATCH("/list/anime/:id", middleware.AuthToken, routes.AddAnimeToList)
 	router.PATCH("/list/characters/:id", middleware.AuthToken, routes.AddCharacterToList)
 
-	router.POST("/comment", middleware.AuthToken, routes.PostComment)
 	router.GET("/comment", routes.GetAllComments)
 	router.GET("/comment/type/:type", routes.GetCommentByType)
+	router.GET("/comment/id/:id", routes.GetCommentById)
+	router.POST("/comment", middleware.AuthToken, routes.PostComment)
+	router.DELETE("/comment/id/:id", middleware.AuthToken, routes.DeleteComment)
 
 	router.Run("localhost:8080")
 }
