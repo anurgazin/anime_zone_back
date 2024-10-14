@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,6 +14,7 @@ func UploadComment(comment Comment) (interface{}, error) {
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 	comment.ID = primitive.NewObjectID()
+	comment.Timestamp = time.Now()
 	insertResult, err := collection.InsertOne(context.TODO(), comment)
 	if err != nil {
 		fmt.Println(err)
