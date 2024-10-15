@@ -50,6 +50,7 @@ func main() {
 	router.GET("/comment/type/:type", routes.GetCommentByType)
 	router.GET("/comment/id/:id", routes.GetCommentById)
 	router.POST("/comment", middleware.AuthToken, routes.PostComment)
+	router.PATCH("/comment/id/:id", middleware.AuthToken, routes.UpdateComment)
 	router.DELETE("/comment/id/:id", middleware.AuthToken, routes.DeleteComment)
 
 	router.Run("localhost:8080")

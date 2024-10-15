@@ -147,3 +147,28 @@ func DeleteComment(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, result)
 }
+
+type UpdateCommentText struct {
+	Text string `bson:"text" json:"text"`
+}
+
+func UpdateComment(c *gin.Context) {
+	var newText UpdateCommentText
+	id := c.Param("id")
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+	if err := c.BindJSON(&newText); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid text"})
+		return
+	}
+	result, err := database.UpdateComment(id, user_id.(string), newText.Text)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.IndentedJSON(http.StatusCreated, result)
+}

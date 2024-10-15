@@ -133,3 +133,46 @@ func DeleteComment(id string, user_id string, user_role string) (interface{}, er
 	fmt.Printf("Successfully updated %v document(s)\n", result.DeletedCount)
 	return result, nil
 }
+
+func UpdateComment(id string, user_id string, text string) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Comments")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	// Convert the string ID to ObjectID
+	objUserID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+	commentData, err := GetCommentById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if commentData.User.UserID != objUserID {
+		return nil, fmt.Errorf("only user whom created comment can edit it")
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"text": text,
+		},
+	}
+
+	result, err := collection.UpdateOne(context.TODO(), bson.M{"_id": objID}, update)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not delete comment: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("no comment found with the given ID")
+	}
+
+	fmt.Printf("Successfully updated %v document(s)\n", result.MatchedCount)
+	return result, nil
+}
