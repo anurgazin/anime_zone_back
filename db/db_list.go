@@ -230,3 +230,89 @@ func GetCharacterListById(id string) (*CharacterList, error) {
 	// Return the found character list
 	return &result, nil
 }
+
+func UpdateAnimeList(id string, user_id string, text string) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("AnimeList")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	// Convert the string ID to ObjectID
+	objUserID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+	listData, err := GetAnimeListById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if listData.UserID != objUserID {
+		return nil, fmt.Errorf("only user whom created list can edit it")
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"name": text,
+		},
+	}
+
+	result, err := collection.UpdateOne(context.TODO(), bson.M{"_id": objID}, update)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not update list: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("no list found with the given ID")
+	}
+
+	fmt.Printf("Successfully updated %v list(s)\n", result.MatchedCount)
+	return result, nil
+}
+
+func UpdateCharacterList(id string, user_id string, text string) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("CharacterList")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	// Convert the string ID to ObjectID
+	objUserID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+	listData, err := GetCharacterListById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if listData.UserID != objUserID {
+		return nil, fmt.Errorf("only user whom created list can edit it")
+	}
+	update := bson.M{
+		"$set": bson.M{
+			"name": text,
+		},
+	}
+
+	result, err := collection.UpdateOne(context.TODO(), bson.M{"_id": objID}, update)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not update list: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("no list found with the given ID")
+	}
+
+	fmt.Printf("Successfully updated %v list(s)\n", result.MatchedCount)
+	return result, nil
+}
