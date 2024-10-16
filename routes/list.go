@@ -181,6 +181,31 @@ type UpdateList struct {
 	Name string `bson:"name" json:"name"`
 }
 
+func EditAnimeList(c *gin.Context) {
+	id := c.Param("id")
+	var updateAnimeList UpdateList
+
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+
+	if err := c.BindJSON(&updateAnimeList); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid text"})
+		return
+	}
+
+	result, err := database.UpdateAnimeList(id, user_id.(string), updateAnimeList.Name)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, result)
+}
+
 func EditCharacterList(c *gin.Context) {
 	id := c.Param("id")
 	var updateCharList UpdateList

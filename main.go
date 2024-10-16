@@ -45,6 +45,7 @@ func main() {
 	router.POST("/list/characters", middleware.AuthToken, routes.PostCharacterList)
 	router.PATCH("/list/anime/add/:id", middleware.AuthToken, routes.AddAnimeToList)
 	router.PATCH("/list/characters/add/:id", middleware.AuthToken, routes.AddCharacterToList)
+	router.PATCH("/list/anime/edit/:id", middleware.AuthToken, routes.EditAnimeList)
 	router.PATCH("/list/characters/edit/:id", middleware.AuthToken, routes.EditCharacterList)
 
 	router.GET("/comment", routes.GetAllComments)
