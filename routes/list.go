@@ -176,3 +176,32 @@ func GetCharacterListById(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, characterList)
 }
+
+type UpdateList struct {
+	Name string `bson:"name" json:"name"`
+}
+
+func EditCharacterList(c *gin.Context) {
+	id := c.Param("id")
+	var updateCharList UpdateList
+
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+
+	if err := c.BindJSON(&updateCharList); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid text"})
+		return
+	}
+
+	result, err := database.UpdateCharacterList(id, user_id.(string), updateCharList.Name)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, result)
+}
