@@ -4,6 +4,7 @@ package azureblob
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
@@ -48,4 +49,27 @@ func UploadFile(fileName string, content []byte, contentType string) (string, er
 
 	fmt.Println("File uploaded successfully! URL: ", fileURL)
 	return fileURL, nil
+}
+
+func DeleteFile(blobUrl string) (string, error) {
+	pathName := strings.Split(blobUrl, "/")
+	blobName := pathName[len(pathName)-1]
+	fmt.Println(blobName)
+	serviceClient, err := GetBlobServiceClient()
+	if err != nil {
+		return "", fmt.Errorf("error getting Blob service client: %w", err)
+	}
+	containerClient := serviceClient.ServiceClient().NewContainerClient(containerName)
+	// Create the blob client and upload the file
+	blockBlobClient := containerClient.NewBlockBlobClient(blobName)
+
+	_, err = blockBlobClient.Delete(context.TODO(), &blob.DeleteOptions{})
+	if err != nil {
+		return "", fmt.Errorf("failed to delete blob: %w", err)
+	}
+
+	// Return a success message
+	result := fmt.Sprintf("Blob '%s' deleted successfully!", blobName)
+	fmt.Println(result)
+	return result, nil
 }

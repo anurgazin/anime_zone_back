@@ -1,6 +1,7 @@
 package database
 
 import (
+	azureblob "anime_zone/back_end/azure_blob"
 	"context"
 	"fmt"
 
@@ -114,7 +115,27 @@ func DeleteCharacter(id string) (interface{}, error) {
 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
 	}
 
+	character, err := GetCharacterById(id)
+
+	if err != nil {
+		return nil, fmt.Errorf("no character found with the given ID")
+	}
+
+	deleteLogoResult, err := azureblob.DeleteFile(character.Logo)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(deleteLogoResult)
+	for i := range character.Media {
+		deleteMediaResult, err := azureblob.DeleteFile(character.Media[i])
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println(deleteMediaResult)
+	}
+
 	filter := bson.M{"_id": objID}
+
 	result, err := collection.DeleteOne(context.TODO(), filter)
 
 	if err != nil {
