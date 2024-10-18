@@ -176,3 +176,30 @@ func UpdateComment(id string, user_id string, text string) (interface{}, error) 
 	fmt.Printf("Successfully updated %v document(s)\n", result.MatchedCount)
 	return result, nil
 }
+
+// function to delete comments which content was deleted
+func DeleteCommentByContentId(content_id string, content_type string) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Comments")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(content_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"type": content_type, "content_id": objID}
+
+	result, err := collection.DeleteMany(context.TODO(), filter)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not delete comments: %w", err)
+	}
+
+	if result.DeletedCount == 0 {
+		return nil, fmt.Errorf("no comments found with the given content ID")
+	}
+
+	fmt.Printf("Successfully updated %v document(s)\n", result.DeletedCount)
+	return result, nil
+}

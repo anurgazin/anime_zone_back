@@ -134,6 +134,12 @@ func DeleteCharacter(id string) (interface{}, error) {
 		fmt.Println(deleteMediaResult)
 	}
 
+	deleteCommentResult, err := DeleteCommentByContentId(id, "character")
+	if err != nil {
+		return nil, fmt.Errorf("error during deleting comments")
+	}
+	fmt.Println(deleteCommentResult)
+
 	filter := bson.M{"_id": objID}
 
 	result, err := collection.DeleteOne(context.TODO(), filter)
