@@ -147,11 +147,5 @@ func DeleteCharacter(id string) (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not delete character: %w", err)
 	}
-
-	if result.DeletedCount == 0 {
-		return nil, fmt.Errorf("no character found with the given ID")
-	}
-
-	fmt.Printf("Successfully updated %v document(s)\n", result.DeletedCount)
 	return result, nil
 }

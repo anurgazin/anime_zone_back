@@ -196,10 +196,6 @@ func DeleteCommentByContentId(content_id string, content_type string) (interface
 		return nil, fmt.Errorf("could not delete comments: %w", err)
 	}
 
-	if result.DeletedCount == 0 {
-		return nil, fmt.Errorf("no comments found with the given content ID")
-	}
-
 	fmt.Printf("Successfully updated %v document(s)\n", result.DeletedCount)
 	return result, nil
 }
