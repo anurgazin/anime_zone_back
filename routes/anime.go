@@ -116,10 +116,11 @@ func PutAnime(c *gin.Context) {
 
 func DeleteAnime(c *gin.Context) {
 	id := c.Param("id")
+	fmt.Println(id)
 	anime, err := database.DeleteAnime(id)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err})
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 	c.IndentedJSON(http.StatusOK, anime)

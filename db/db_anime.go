@@ -1,6 +1,7 @@
 package database
 
 import (
+	azureblob "anime_zone/back_end/azure_blob"
 	"context"
 	"fmt"
 
@@ -137,12 +138,30 @@ func DeleteAnime(id string) (interface{}, error) {
 	anime_collection := client.Database("Anime-Zone").Collection("Anime")
 	character_collection := client.Database("Anime-Zone").Collection("Characters")
 
+	anime_get, err := GetAnimeById(id)
+	if err != nil {
+		return nil, fmt.Errorf("no anime found with the given ID")
+	}
+
+	deleteLogoResult, err := azureblob.DeleteFile(anime_get.Logo)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(deleteLogoResult)
+	media := anime_get.Media[1:]
+	for i := range media {
+		deleteMediaResult, err := azureblob.DeleteFile(media[i])
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println(deleteMediaResult)
+	}
+
 	// Convert the string ID to ObjectID
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
 	}
-
 	filter := bson.M{"_id": objID}
 	anime_result, err := anime_collection.DeleteOne(context.TODO(), filter)
 
@@ -156,16 +175,29 @@ func DeleteAnime(id string) (interface{}, error) {
 
 	// Delete characters where `from_anime` contains the anime ID
 	character_filter := bson.M{"from_anime": bson.M{"$in": []primitive.ObjectID{objID}}}
-	character_result, err := character_collection.DeleteMany(context.TODO(), character_filter)
+	character_cursor, err := character_collection.Find(context.TODO(), character_filter)
 	if err != nil {
-		return nil, fmt.Errorf("could not delete characters: %w", err)
+		return nil, fmt.Errorf("could not get characters: %w", err)
 	}
-
-	fmt.Printf("Successfully deleted %v anime document(s)\n", anime_result.DeletedCount)
-	fmt.Printf("Successfully deleted %v character document(s)\n", character_result.DeletedCount)
+	var characters_get_result []Character
+	if err := character_cursor.All(context.TODO(), &characters_get_result); err != nil {
+		return nil, err
+	}
+	var delete_character_result interface{}
+	for i := range characters_get_result {
+		delete_character_result, err = DeleteCharacter(characters_get_result[i].ID.Hex())
+		if err != nil {
+			return nil, err
+		}
+	}
+	comment_result, err := DeleteCommentByContentId(id, "anime")
+	if err != nil {
+		return nil, fmt.Errorf("error during deleting comments")
+	}
 
 	return map[string]interface{}{
 		"deleted_anime_count":     anime_result.DeletedCount,
-		"deleted_character_count": character_result.DeletedCount,
+		"deleted_character_count": delete_character_result,
+		"deleted_comment_count":   comment_result,
 	}, nil
 }
