@@ -199,3 +199,29 @@ func DeleteCommentByContentId(content_id string, content_type string) (interface
 	fmt.Printf("Successfully updated %v document(s)\n", result.DeletedCount)
 	return result, nil
 }
+
+func UpdateCommentRating(id string, value float64) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Comments")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$inc": bson.M{"rating": value}}
+	result, err := collection.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not update comment rating: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("no comment found with the given ID")
+	}
+
+	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
+	return result, nil
+}

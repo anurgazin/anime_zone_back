@@ -116,7 +116,6 @@ func PutAnime(c *gin.Context) {
 
 func DeleteAnime(c *gin.Context) {
 	id := c.Param("id")
-	fmt.Println(id)
 	anime, err := database.DeleteAnime(id)
 
 	if err != nil {
@@ -125,3 +124,36 @@ func DeleteAnime(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, anime)
 }
+
+// type UpdateRatingAction struct {
+// 	Action string `json:"action" form:"action"` // "increment" or "decrement"
+// }
+
+// func UpdateAnimeRating(c *gin.Context) {
+// 	id := c.Param("id")
+// 	var updateData UpdateRatingAction
+
+// 	// Bind the action (increment or decrement) from the request
+// 	if err := c.ShouldBindJSON(&updateData); err != nil {
+// 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+// 		return
+// 	}
+// 	// Determine the increment value based on the action
+// 	var incrementValue float64
+// 	if updateData.Action == "increment" {
+// 		incrementValue = 1.0
+// 	} else if updateData.Action == "decrement" {
+// 		incrementValue = -1.0
+// 	} else {
+// 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid action. Use 'increment' or 'decrement'."})
+// 		return
+// 	}
+
+// 	result, err := database.UpdateAnimeRating(id, incrementValue)
+// 	if err != nil {
+// 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update anime rating or anime not found"})
+// 		return
+// 	}
+// 	fmt.Println(result)
+// 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Anime rating updated successfully"})
+// }
