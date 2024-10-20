@@ -41,6 +41,11 @@ const (
 	ESRBNone ESRB = "none"
 )
 
+type Media struct {
+	MediaType string
+	MediaLink string
+}
+
 // Define the Anime struct for BSON compatibility and form binding
 type Anime struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
