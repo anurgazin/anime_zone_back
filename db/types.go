@@ -46,40 +46,51 @@ type Media struct {
 	MediaLink string
 }
 
+type Rating struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	AnimeID   primitive.ObjectID `bson:"anime_id" json:"anime_id"`                 // Reference to the Anime
+	UserID    primitive.ObjectID `bson:"user_id" json:"user_id"`                   // ID of the user giving the rating
+	Score     float64            `bson:"score" json:"score"`                       // Rating score
+	Timestamp time.Time          `bson:"timestamp" json:"timestamp"`               // When the rating was given
+	Review    string             `bson:"review,omitempty" json:"review,omitempty"` // Optional user review
+}
+
 // Define the Anime struct for BSON compatibility and form binding
 type Anime struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
-	Title       string             `bson:"title" json:"title" form:"title"`
-	ReleaseDate time.Time          `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
-	Rating      float64            `bson:"rating" json:"rating" form:"rating"`
-	Genre       []string           `bson:"genre" json:"genre" form:"genre"`
-	Type        Type               `bson:"type" json:"type" form:"type"`
-	Episodes    int                `bson:"episodes" json:"episodes" form:"episodes"`
-	Description string             `bson:"description" json:"description" form:"description"`
-	Studio      []string           `bson:"studio" json:"studio" form:"studio"`
-	Duration    int                `bson:"duration" json:"duration" form:"duration"` // in minutes
-	Status      Status             `bson:"status" json:"status" form:"status"`
-	ESRB        ESRB               `bson:"esrb" json:"esrb" form:"esrb"`
-	Logo        string             `bson:"logo" json:"logo" form:"logo"`
-	Media       []string           `bson:"media" json:"media" form:"media"`
+	ID            primitive.ObjectID `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
+	Title         string             `bson:"title" json:"title" form:"title"`
+	ReleaseDate   time.Time          `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
+	AverageRating float64            `bson:"average_rating" json:"average_rating"`                 // Average rating score
+	RatingCount   int                `bson:"rating_count" json:"rating_count"`                     // Total number of ratings
+	Genre         []string           `bson:"genre" json:"genre" form:"genre"`
+	Type          Type               `bson:"type" json:"type" form:"type"`
+	Episodes      int                `bson:"episodes" json:"episodes" form:"episodes"`
+	Description   string             `bson:"description" json:"description" form:"description"`
+	Studio        []string           `bson:"studio" json:"studio" form:"studio"`
+	Duration      int                `bson:"duration" json:"duration" form:"duration"` // in minutes
+	Status        Status             `bson:"status" json:"status" form:"status"`
+	ESRB          ESRB               `bson:"esrb" json:"esrb" form:"esrb"`
+	Logo          string             `bson:"logo" json:"logo" form:"logo"`
+	Media         []string           `bson:"media" json:"media" form:"media"`
 }
 
 type AnimeUploader struct {
-	ID          primitive.ObjectID      `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
-	Title       string                  `bson:"title" json:"title" form:"title"`
-	ReleaseDate time.Time               `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
-	Rating      float64                 `bson:"rating" json:"rating" form:"rating"`
-	Genre       []string                `bson:"genre" json:"genre" form:"genre"`
-	Type        Type                    `bson:"type" json:"type" form:"type"`
-	Episodes    int                     `bson:"episodes" json:"episodes" form:"episodes"`
-	Description string                  `bson:"description" json:"description" form:"description"`
-	Studio      []string                `bson:"studio" json:"studio" form:"studio"`
-	Duration    int                     `bson:"duration" json:"duration" form:"duration"` // in minutes
-	Status      Status                  `bson:"status" json:"status" form:"status"`
-	ESRB        ESRB                    `bson:"esrb" json:"esrb" form:"esrb"`
-	Link        string                  `bson:"link" json:"link" form:"link"`
-	Logo        *multipart.FileHeader   `bson:"logo" json:"logo" form:"logo"`
-	Media       []*multipart.FileHeader `bson:"media" json:"media" form:"media"`
+	ID            primitive.ObjectID      `bson:"_id,omitempty" json:"id" form:"id"` // MongoDB ObjectID
+	Title         string                  `bson:"title" json:"title" form:"title"`
+	ReleaseDate   time.Time               `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
+	AverageRating float64                 `bson:"average_rating" json:"average_rating"`                 // Average rating score
+	RatingCount   int                     `bson:"rating_count" json:"rating_count"`                     // Total number of ratings
+	Genre         []string                `bson:"genre" json:"genre" form:"genre"`
+	Type          Type                    `bson:"type" json:"type" form:"type"`
+	Episodes      int                     `bson:"episodes" json:"episodes" form:"episodes"`
+	Description   string                  `bson:"description" json:"description" form:"description"`
+	Studio        []string                `bson:"studio" json:"studio" form:"studio"`
+	Duration      int                     `bson:"duration" json:"duration" form:"duration"` // in minutes
+	Status        Status                  `bson:"status" json:"status" form:"status"`
+	ESRB          ESRB                    `bson:"esrb" json:"esrb" form:"esrb"`
+	Link          string                  `bson:"link" json:"link" form:"link"`
+	Logo          *multipart.FileHeader   `bson:"logo" json:"logo" form:"logo"`
+	Media         []*multipart.FileHeader `bson:"media" json:"media" form:"media"`
 }
 
 // Filters struct represents the filters used to search for anime
