@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	"strconv"
 )
 
 func GetAnime(c *gin.Context) {
@@ -73,7 +74,8 @@ func PostAnime(c *gin.Context) {
 
 	newAnime.Title = newAnimeUploader.Title
 	newAnime.ReleaseDate = newAnimeUploader.ReleaseDate
-	newAnime.Rating = newAnimeUploader.Rating
+	newAnime.AverageRating = newAnimeUploader.AverageRating
+	newAnime.RatingCount = newAnimeUploader.RatingCount
 	newAnime.Genre = newAnimeUploader.Genre
 	newAnime.Type = newAnimeUploader.Type
 	newAnime.Episodes = newAnimeUploader.Episodes
@@ -125,35 +127,32 @@ func DeleteAnime(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-// type UpdateRatingAction struct {
-// 	Action string `json:"action" form:"action"` // "increment" or "decrement"
-// }
+type RatingRequest struct {
+	Score  float64 `json:"score" binding:"required"`
+	Review string  `json:"review"` // optional
+}
 
-// func UpdateAnimeRating(c *gin.Context) {
-// 	id := c.Param("id")
-// 	var updateData UpdateRatingAction
+func RateAnime(c *gin.Context) {
+	// Parse the rating request body
+	anime_id := c.Param("id")
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+	var ratingRequest RatingRequest
+	if err := c.ShouldBindJSON(&ratingRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
-// 	// Bind the action (increment or decrement) from the request
-// 	if err := c.ShouldBindJSON(&updateData); err != nil {
-// 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
-// 		return
-// 	}
-// 	// Determine the increment value based on the action
-// 	var incrementValue float64
-// 	if updateData.Action == "increment" {
-// 		incrementValue = 1.0
-// 	} else if updateData.Action == "decrement" {
-// 		incrementValue = -1.0
-// 	} else {
-// 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid action. Use 'increment' or 'decrement'."})
-// 		return
-// 	}
-
-// 	result, err := database.UpdateAnimeRating(id, incrementValue)
-// 	if err != nil {
-// 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update anime rating or anime not found"})
-// 		return
-// 	}
-// 	fmt.Println(result)
-// 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Anime rating updated successfully"})
-// }
+	result, err := database.PostRating(anime_id, user_id.(string), ratingRequest.Score, ratingRequest.Review)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to submit rating"})
+		return
+	}
+	fmt.Println(result)
+	c.JSON(http.StatusOK, gin.H{"message": "Rating submitted successfully!"})
+}

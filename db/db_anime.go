@@ -4,6 +4,7 @@ import (
 	azureblob "anime_zone/back_end/azure_blob"
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -104,19 +105,20 @@ func UpdateAnime(id string, updatedAnime Anime) (interface{}, error) {
 	// $set operator is used to update the provided fields
 	update := bson.M{
 		"$set": bson.M{
-			"title":        updatedAnime.Title,
-			"release_date": updatedAnime.ReleaseDate,
-			"rating":       updatedAnime.Rating,
-			"genre":        updatedAnime.Genre,
-			"type":         updatedAnime.Type,
-			"episodes":     updatedAnime.Episodes,
-			"description":  updatedAnime.Description,
-			"studio":       updatedAnime.Studio,
-			"duration":     updatedAnime.Duration,
-			"status":       updatedAnime.Status,
-			"esrb":         updatedAnime.ESRB,
-			"logo":         updatedAnime.Logo,
-			"media":        updatedAnime.Media,
+			"title":          updatedAnime.Title,
+			"release_date":   updatedAnime.ReleaseDate,
+			"average_rating": updatedAnime.AverageRating,
+			"rating_count":   updatedAnime.RatingCount,
+			"genre":          updatedAnime.Genre,
+			"type":           updatedAnime.Type,
+			"episodes":       updatedAnime.Episodes,
+			"description":    updatedAnime.Description,
+			"studio":         updatedAnime.Studio,
+			"duration":       updatedAnime.Duration,
+			"status":         updatedAnime.Status,
+			"esrb":           updatedAnime.ESRB,
+			"logo":           updatedAnime.Logo,
+			"media":          updatedAnime.Media,
 		},
 	}
 
@@ -202,28 +204,81 @@ func DeleteAnime(id string) (interface{}, error) {
 	}, nil
 }
 
-// func UpdateAnimeRating(id string, value float64) (interface{}, error) {
-// 	client := RunMongo()
-// 	collection := client.Database("Anime-Zone").Collection("Anime")
+func PostRating(anime_id string, user_id string, score float64, review string) (interface{}, error) {
+	client := RunMongo()
+	rating_collection := client.Database("Anime-Zone").Collection("Rating")
+	anime_collection := client.Database("Anime-Zone").Collection("Anime")
 
-// 	// Convert the string ID to ObjectID
-// 	objID, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
-// 	}
+	// Validate AnimeID and UserID as valid MongoDB ObjectIDs
+	animeID, err := primitive.ObjectIDFromHex(anime_id)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, fmt.Errorf("invalid anime ID")
+	}
 
-// 	filter := bson.M{"_id": objID}
-// 	update := bson.M{"$inc": bson.M{"rating": value}}
-// 	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	userID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, fmt.Errorf("invalid user ID")
+	}
 
-// 	if err != nil {
-// 		return nil, fmt.Errorf("could not update anime rating: %w", err)
-// 	}
+	// Create a new rating object
+	newRating := Rating{
+		ID:        primitive.NewObjectID(),
+		AnimeID:   animeID,
+		UserID:    userID,
+		Score:     score,
+		Timestamp: time.Now(),
+		Review:    review,
+	}
 
-// 	if result.MatchedCount == 0 {
-// 		return nil, fmt.Errorf("no anime found with the given ID")
-// 	}
+	// Insert the rating into the ratings collection
+	result, err := rating_collection.InsertOne(context.TODO(), newRating)
+	if err != nil {
+		return nil, err
+	}
 
-// 	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
-// 	return result, nil
-// }
+	// Update the anime's average rating and rating count
+	updateAnimeRating(animeID, rating_collection, anime_collection)
+	return result.InsertedID, nil
+}
+
+// Helper function to update anime's average rating and rating count
+func updateAnimeRating(animeID primitive.ObjectID, rating_collection *mongo.Collection, anime_collection *mongo.Collection) {
+	// Fetch all ratings for this anime
+	filter := bson.M{"anime_id": animeID}
+	cursor, err := rating_collection.Find(context.TODO(), filter)
+	if err != nil {
+		fmt.Printf("Error finding ratings: %v", err)
+		return
+	}
+
+	var totalScore float64
+	var count int
+
+	for cursor.Next(context.TODO()) {
+		var rating Rating
+		if err := cursor.Decode(&rating); err != nil {
+			fmt.Printf("Error decoding rating: %v", err)
+			continue
+		}
+		totalScore += rating.Score
+		count++
+	}
+
+	// Calculate new average rating
+	averageRating := totalScore / float64(count)
+
+	// Update the anime's document
+	update := bson.M{
+		"$set": bson.M{
+			"average_rating": averageRating,
+			"rating_count":   count,
+		},
+	}
+
+	_, err = anime_collection.UpdateOne(context.TODO(), bson.M{"_id": animeID}, update)
+	if err != nil {
+		fmt.Printf("Error updating anime rating: %v", err)
+	}
+}
