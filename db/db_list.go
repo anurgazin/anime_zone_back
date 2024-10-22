@@ -342,3 +342,29 @@ func UpdateAnimeListRating(id string, value float64) (interface{}, error) {
 	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
 	return result, nil
 }
+
+func UpdateCharacterListRating(id string, value float64) (interface{}, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("CharacterList")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+	update := bson.M{"$inc": bson.M{"rating": value}}
+	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return nil, fmt.Errorf("could not update character list rating: %w", err)
+	}
+
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("no character list found with the given ID")
+	}
+
+	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
+	return result, nil
+}
