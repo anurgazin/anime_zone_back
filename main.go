@@ -49,6 +49,7 @@ func main() {
 	router.PATCH("/list/anime/edit/:id", middleware.AuthToken, routes.EditAnimeList)
 	router.PATCH("/list/characters/edit/:id", middleware.AuthToken, routes.EditCharacterList)
 	router.PATCH("/list/anime/rating/:id", middleware.AuthToken, routes.UpdateAnimeListRating)
+	router.PATCH("/list/characters/rating/:id", middleware.AuthToken, routes.UpdateCharacterListRating)
 
 	router.GET("/comment", routes.GetAllComments)
 	router.GET("/comment/type/:type", routes.GetCommentByType)
