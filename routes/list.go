@@ -230,3 +230,35 @@ func EditCharacterList(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, result)
 }
+
+type UpdateListRatingAction struct {
+	Action string `json:"action" form:"action"` // "increment" or "decrement"
+}
+
+func UpdateAnimeListRating(c *gin.Context) {
+	id := c.Param("id")
+	var updateData UpdateListRatingAction
+
+	// Bind the action (increment or decrement) from the request
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+	// Determine the increment value based on the action
+	var incrementValue float64
+	if updateData.Action == "increment" {
+		incrementValue = 1.0
+	} else if updateData.Action == "decrement" {
+		incrementValue = -1.0
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid action. Use 'increment' or 'decrement'."})
+		return
+	}
+
+	_, err := database.UpdateAnimeListRating(id, incrementValue)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update anime list rating or anime list not found"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Anime List rating updated successfully"})
+}
