@@ -47,18 +47,22 @@ func PostCharacters(g *gin.Context) {
 	}
 
 	// Check if all anime in FromAnime exist
-	var fromAnime = []primitive.ObjectID{}
-	for _, animeId := range newCharacterUploader.FromAnime {
-		if !funcs.CheckAnimeExistsById(animeId) {
+	var fromAnime = []database.FromAnime{}
+	for _, s_id := range newCharacterUploader.FromAnime {
+		var a database.FromAnime
+		res, err := database.GetAnimeById(s_id)
+		if err != nil {
 			// If any anime doesn't exist, return an error message
-			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeId})
+			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + s_id})
 			return
 		}
-		id, err := primitive.ObjectIDFromHex(animeId)
+		id, err := primitive.ObjectIDFromHex(s_id)
 		if err != nil {
-			g.JSON(http.StatusBadRequest, gin.H{"error": "invalid ObjectID format " + animeId})
+			g.JSON(http.StatusBadRequest, gin.H{"error": "invalid ObjectID format " + s_id})
 		}
-		fromAnime = append(fromAnime, id)
+		a.ID = id
+		a.Title = res.Title
+		fromAnime = append(fromAnime, a)
 	}
 
 	var title string = newCharacterUploader.FirstName + " " + newCharacterUploader.LastName
@@ -111,10 +115,10 @@ func PutCharacters(g *gin.Context) {
 	}
 
 	// Check if all anime in FromAnime exist
-	for _, animeId := range updatedCharacter.FromAnime {
-		if !funcs.CheckAnimeExistsById(animeId.Hex()) {
+	for _, anime := range updatedCharacter.FromAnime {
+		if !funcs.CheckAnimeExistsById(anime.ID.Hex()) {
 			// If any anime doesn't exist, return an error message
-			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + animeId.Hex()})
+			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + anime.ID.Hex()})
 			return
 		}
 	}
