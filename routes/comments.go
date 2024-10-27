@@ -205,3 +205,16 @@ func UpdateCommentRating(c *gin.Context) {
 	fmt.Println(result)
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Comment rating updated successfully"})
 }
+
+func GetCommentForContent(c *gin.Context) {
+	content_type := c.Param("type")
+	content_id := c.Param("id")
+
+	comment, err := database.GetAllCommentsForContent(content_type, content_id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, comment)
+}

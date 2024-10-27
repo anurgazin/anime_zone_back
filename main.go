@@ -62,6 +62,7 @@ func main() {
 	router.GET("/comment", routes.GetAllComments)
 	router.GET("/comment/type/:type", routes.GetCommentByType)
 	router.GET("/comment/id/:id", routes.GetCommentById)
+	router.GET("/comment/:type/:id", routes.GetCommentForContent)
 	router.POST("/comment", middleware.AuthToken, routes.PostComment)
 	router.PATCH("/comment/id/:id", middleware.AuthToken, routes.UpdateComment)
 	router.PATCH("/comment/rating/:id", middleware.AuthToken, routes.UpdateCommentRating)
