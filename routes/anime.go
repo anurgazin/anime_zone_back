@@ -156,3 +156,15 @@ func RateAnime(c *gin.Context) {
 	fmt.Println(result)
 	c.JSON(http.StatusOK, gin.H{"message": "Rating submitted successfully!"})
 }
+
+func GetAnimeRatingById(c *gin.Context) {
+	id := c.Param("id")
+
+	anime, err := database.GetAnimeRatingById(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, anime)
+}
