@@ -225,3 +225,31 @@ func UpdateCommentRating(id string, value float64) (interface{}, error) {
 	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
 	return result, nil
 }
+
+func GetAllCommentsForContent(content_type string, content_id string) ([]Comment, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Comments")
+
+	c_type := CommentType(content_type)
+	c_id, err := primitive.ObjectIDFromHex(content_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"type": c_type, "content_id": c_id}
+
+	var result []Comment
+	cursor, err := collection.Find(context.TODO(), filter)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no comment found with the given type and id")
+		}
+		return nil, fmt.Errorf("error finding comments: %w", err)
+	}
+	if err = cursor.All(context.TODO(), &result); err != nil {
+		return nil, fmt.Errorf("error decoding comments: %w", err)
+	}
+	// Return the found comments
+	return result, nil
+}
