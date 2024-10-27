@@ -282,3 +282,33 @@ func updateAnimeRating(animeID primitive.ObjectID, rating_collection *mongo.Coll
 		fmt.Printf("Error updating anime rating: %v", err)
 	}
 }
+
+func GetAnimeRatingById(id string) ([]Rating, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Rating")
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"anime_id": objID}
+
+	var result []Rating
+	cursor, err := collection.Find(context.TODO(), filter)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no anime ratings found with the given ID")
+		}
+		return nil, fmt.Errorf("error finding anime ratings: %w", err)
+	}
+
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	// Return the found anime
+	return result, nil
+}
