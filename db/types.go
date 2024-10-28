@@ -46,10 +46,16 @@ type Media struct {
 	MediaLink string
 }
 
+// CommentUser struct represents CommentUser information
+type RatingUser struct {
+	UserID   primitive.ObjectID `bson:"user_id" json:"user_id"`
+	Username string             `bson:"username" json:"username"`
+}
+
 type Rating struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	AnimeID   primitive.ObjectID `bson:"anime_id" json:"anime_id"`                 // Reference to the Anime
-	UserID    primitive.ObjectID `bson:"user_id" json:"user_id"`                   // ID of the user giving the rating
+	User      RatingUser         `bson:"user" json:"user"`                         // ID of the user giving the rating
 	Score     float64            `bson:"score" json:"score"`                       // Rating score
 	Timestamp time.Time          `bson:"timestamp" json:"timestamp"`               // When the rating was given
 	Review    string             `bson:"review,omitempty" json:"review,omitempty"` // Optional user review
