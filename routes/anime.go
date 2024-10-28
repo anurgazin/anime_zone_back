@@ -141,13 +141,19 @@ func RateAnime(c *gin.Context) {
 		c.Abort()
 		return
 	}
+	username, exists := c.Get("username")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
 	var ratingRequest RatingRequest
 	if err := c.ShouldBindJSON(&ratingRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	result, err := database.PostRating(anime_id, user_id.(string), ratingRequest.Score, ratingRequest.Review)
+	result, err := database.PostRating(anime_id, user_id.(string), username.(string), ratingRequest.Score, ratingRequest.Review)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to submit rating"})

@@ -204,7 +204,7 @@ func DeleteAnime(id string) (interface{}, error) {
 	}, nil
 }
 
-func PostRating(anime_id string, user_id string, score float64, review string) (interface{}, error) {
+func PostRating(anime_id string, user_id string, username string, score float64, review string) (interface{}, error) {
 	client := RunMongo()
 	rating_collection := client.Database("Anime-Zone").Collection("Rating")
 	anime_collection := client.Database("Anime-Zone").Collection("Anime")
@@ -221,12 +221,15 @@ func PostRating(anime_id string, user_id string, score float64, review string) (
 		fmt.Println(err.Error())
 		return nil, fmt.Errorf("invalid user ID")
 	}
+	var user RatingUser
+	user.UserID = userID
+	user.Username = username
 
 	// Create a new rating object
 	newRating := Rating{
 		ID:        primitive.NewObjectID(),
 		AnimeID:   animeID,
-		UserID:    userID,
+		User:      user,
 		Score:     score,
 		Timestamp: time.Now(),
 		Review:    review,
