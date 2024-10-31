@@ -290,3 +290,27 @@ func UpdateCharacterListRating(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Character List rating updated successfully"})
 }
+
+func GetAnimeListsByAnimeId(c *gin.Context) {
+	id := c.Param("id")
+
+	animeList, err := database.GetAllAnimeListsByAnimeId(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, animeList)
+}
+
+func GetCharacterListsByCharacterId(c *gin.Context) {
+	id := c.Param("id")
+
+	animeList, err := database.GetAllCharacterListsByCharacterId(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, animeList)
+}

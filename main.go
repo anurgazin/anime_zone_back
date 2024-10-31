@@ -51,6 +51,8 @@ func main() {
 	router.GET("/list/characters", routes.GetCharacterLists)
 	router.GET("/list/anime/:id", routes.GetAnimeListById)
 	router.GET("/list/characters/:id", routes.GetCharacterListById)
+	router.GET("/list/anime/anime/:id", routes.GetAnimeListsByAnimeId)
+	router.GET("/list/characters/character/:id", routes.GetCharacterListsByCharacterId)
 	router.POST("/list/anime", middleware.AuthToken, routes.PostAnimeList)
 	router.POST("/list/characters", middleware.AuthToken, routes.PostCharacterList)
 	router.PATCH("/list/anime/add/:id", middleware.AuthToken, routes.AddAnimeToList)
