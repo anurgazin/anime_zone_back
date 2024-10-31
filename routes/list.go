@@ -22,6 +22,12 @@ func PostAnimeList(c *gin.Context) {
 		c.Abort()
 		return
 	}
+	username, exists := c.Get("username")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "Username not found"})
+		c.Abort()
+		return
+	}
 
 	if err := c.BindJSON(&newAnimeList); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid anime list title"})
@@ -29,7 +35,7 @@ func PostAnimeList(c *gin.Context) {
 	}
 	newAnimeList.UserId = id.(string)
 
-	insertedID, err := database.CreateAnimeList(newAnimeList.ListTitle, newAnimeList.UserId)
+	insertedID, err := database.CreateAnimeList(newAnimeList.ListTitle, newAnimeList.UserId, username.(string))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -47,6 +53,12 @@ func PostCharacterList(c *gin.Context) {
 		c.Abort()
 		return
 	}
+	username, exists := c.Get("username")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "Username not found"})
+		c.Abort()
+		return
+	}
 
 	if err := c.BindJSON(&newCharacterList); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid anime list title"})
@@ -54,7 +66,7 @@ func PostCharacterList(c *gin.Context) {
 	}
 	newCharacterList.UserId = id.(string)
 
-	insertedID, err := database.CreateCharacterList(newCharacterList.ListTitle, newCharacterList.UserId)
+	insertedID, err := database.CreateCharacterList(newCharacterList.ListTitle, newCharacterList.UserId, username.(string))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return

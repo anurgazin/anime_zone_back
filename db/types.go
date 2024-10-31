@@ -162,11 +162,17 @@ type UserUploader struct {
 	Logo     *multipart.FileHeader `bson:"logo" json:"logo" form:"logo"`
 }
 
+// ListUser struct represents ListUser information
+type ListUser struct {
+	UserID   primitive.ObjectID `bson:"user_id" json:"user_id"`
+	Username string             `bson:"username" json:"username"`
+}
+
 // AnimeList struct represents AnimeList information
 type AnimeList struct {
 	ID        primitive.ObjectID   `bson:"_id" json:"id"`
 	Name      string               `bson:"name" json:"name"`
-	UserID    primitive.ObjectID   `bson:"user_id" json:"user_id"`
+	User      ListUser             `bson:"user" json:"user"`
 	AnimeList []primitive.ObjectID `bson:"anime_list" json:"anime_list"`
 	Rating    float64              `bson:"rating" json:"rating"`
 }
@@ -175,7 +181,7 @@ type AnimeList struct {
 type CharacterList struct {
 	ID            primitive.ObjectID   `bson:"_id" json:"id"`
 	Name          string               `bson:"name" json:"name"`
-	UserID        primitive.ObjectID   `bson:"user_id" json:"user_id"`
+	User          ListUser             `bson:"user" json:"user"`
 	CharacterList []primitive.ObjectID `bson:"character_list" json:"character_list"`
 	Rating        float64              `bson:"rating" json:"rating"`
 }
