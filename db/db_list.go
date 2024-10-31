@@ -9,8 +9,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateAnimeList(listName string, id string) (interface{}, error) {
+func CreateAnimeList(listName string, id string, username string) (interface{}, error) {
 	var animeList AnimeList
+	var listUser ListUser
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 	animeList.ID = primitive.NewObjectID()
@@ -18,7 +19,9 @@ func CreateAnimeList(listName string, id string) (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid UserId format: %w", err)
 	}
-	animeList.UserID = userId
+	listUser.UserID = userId
+	listUser.Username = username
+	animeList.User = listUser
 	animeList.Name = listName
 	animeList.AnimeList = []primitive.ObjectID{}
 	insertResult, err := collection.InsertOne(context.TODO(), animeList)
@@ -30,8 +33,9 @@ func CreateAnimeList(listName string, id string) (interface{}, error) {
 	return insertResult.InsertedID, nil
 }
 
-func CreateCharacterList(listName string, id string) (interface{}, error) {
+func CreateCharacterList(listName string, id string, username string) (interface{}, error) {
 	var characterList CharacterList
+	var listUser ListUser
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 	characterList.ID = primitive.NewObjectID()
@@ -39,7 +43,9 @@ func CreateCharacterList(listName string, id string) (interface{}, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid UserId format: %w", err)
 	}
-	characterList.UserID = userId
+	listUser.UserID = userId
+	listUser.Username = username
+	characterList.User = listUser
 	characterList.Name = listName
 	characterList.CharacterList = []primitive.ObjectID{}
 	insertResult, err := collection.InsertOne(context.TODO(), characterList)
@@ -65,7 +71,7 @@ func AddAnimeToList(listId string, userId string, animeId string) (interface{}, 
 		return nil, fmt.Errorf("invalid ObjectID format (ListId): %w", err)
 	}
 
-	filter := bson.M{"_id": lID, "user_id": uID}
+	filter := bson.M{"_id": lID, "user.user_id": uID}
 	var animeList AnimeList
 	err = collection.FindOne(context.TODO(), filter).Decode(&animeList)
 	if err != nil {
@@ -111,7 +117,7 @@ func AddCharacterToList(listId string, userId string, characterId string) (inter
 		return nil, fmt.Errorf("invalid ObjectID format (ListId): %w", err)
 	}
 
-	filter := bson.M{"_id": lID, "user_id": uID}
+	filter := bson.M{"_id": lID, "user.user_id": uID}
 	var characterList CharacterList
 	err = collection.FindOne(context.TODO(), filter).Decode(&characterList)
 	if err != nil {
@@ -251,7 +257,7 @@ func UpdateAnimeList(id string, user_id string, text string) (interface{}, error
 		return nil, err
 	}
 
-	if listData.UserID != objUserID {
+	if listData.User.UserID != objUserID {
 		return nil, fmt.Errorf("only user whom created list can edit it")
 	}
 	update := bson.M{
@@ -294,7 +300,7 @@ func UpdateCharacterList(id string, user_id string, text string) (interface{}, e
 		return nil, err
 	}
 
-	if listData.UserID != objUserID {
+	if listData.User.UserID != objUserID {
 		return nil, fmt.Errorf("only user whom created list can edit it")
 	}
 	update := bson.M{
