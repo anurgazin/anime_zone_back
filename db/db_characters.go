@@ -149,3 +149,30 @@ func DeleteCharacter(id string) (interface{}, error) {
 	}
 	return result, nil
 }
+
+func GetAllCharactersFromAnime(anime_id string) ([]Character, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Characters")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(anime_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"from_anime.id": objID}
+
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		panic(err)
+	}
+
+	var result []Character
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all characters")
+	return result, nil
+}
