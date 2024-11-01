@@ -143,3 +143,14 @@ func DeleteCharacter(g *gin.Context) {
 	}
 	g.IndentedJSON(http.StatusOK, character)
 }
+
+func GetCharactersByAnimeId(g *gin.Context) {
+	id := g.Param("id")
+	character, err := database.GetAllCharactersFromAnime(id)
+
+	if err != nil {
+		g.IndentedJSON(http.StatusNotFound, gin.H{"message": "character not found"})
+		return
+	}
+	g.IndentedJSON(http.StatusOK, character)
+}

@@ -43,6 +43,7 @@ func main() {
 
 	router.GET("/characters", routes.GetCharacters)
 	router.GET("/characters/:id", routes.GetCharactersById)
+	router.GET("/characters/anime/:id", routes.GetCharactersByAnimeId)
 	router.POST("/characters", middleware.AuthToken, middleware.IsAdmin, routes.PostCharacters)
 	router.PUT("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.PutCharacters)
 	router.DELETE("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.DeleteCharacter)
