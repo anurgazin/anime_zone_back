@@ -12,7 +12,7 @@ import (
 )
 
 func getDefault(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, "Hello, World")
+	c.IndentedJSON(http.StatusOK, "Hello, I am Anime Zone. This is your ultimate destination for discovering, exploring, and sharing your passion for anime!")
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +26,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	config.ExposeHeaders = []string{"Content-Length"}
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
+
 	router.GET("/", getDefault)
 
 	router.POST("/register", routes.Registration)
