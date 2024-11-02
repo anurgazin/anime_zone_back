@@ -81,7 +81,7 @@ func GoDotEnvVariable(key string) string {
 // Function to check if an anime exists by making a GET request to /anime/:title
 func CheckAnimeExistsByTitle(title string) bool {
 	// Make the GET request to the /anime/:title endpoint
-	url := "http://localhost:8080/anime/title/" + title
+	url := GoDotEnvVariable("WEBSITE_URL") + "/anime/title/" + title
 	resp, err := http.Get(url)
 
 	// If there is an error or the status code is not 200 (OK), return false
@@ -95,7 +95,7 @@ func CheckAnimeExistsByTitle(title string) bool {
 // Function to check if an anime exists by making a GET request to /anime/:id
 func CheckAnimeExistsById(id string) bool {
 	// Make the GET request to the /anime/:title endpoint
-	url := "http://localhost:8080/anime/id/" + id
+	url := GoDotEnvVariable("WEBSITE_URL") + "/anime/id/" + id
 	resp, err := http.Get(url)
 
 	// If there is an error or the status code is not 200 (OK), return false
@@ -109,7 +109,7 @@ func CheckAnimeExistsById(id string) bool {
 // Function to check if an anime exists by making a GET request to /anime/:title
 func CheckCharactersExistsById(id string) bool {
 	// Make the GET request to the /anime/:title endpoint
-	url := "http://localhost:8080/characters/" + id
+	url := GoDotEnvVariable("WEBSITE_URL") + "/characters/" + id
 	resp, err := http.Get(url)
 
 	// If there is an error or the status code is not 200 (OK), return false
@@ -123,7 +123,7 @@ func CheckCharactersExistsById(id string) bool {
 // Function to check if a character list exists by making a GET request to /list/characters/:id
 func CheckCharacterListExistsById(id string) bool {
 	// Make the GET request to the /anime/:title endpoint
-	url := "http://localhost:8080/list/characters/" + id
+	url := GoDotEnvVariable("WEBSITE_URL") + "/list/characters/" + id
 	resp, err := http.Get(url)
 
 	// If there is an error or the status code is not 200 (OK), return false
@@ -137,7 +137,7 @@ func CheckCharacterListExistsById(id string) bool {
 // Function to check if an anime list exists by making a GET request to /list/anime/:id
 func CheckAnimeListExistsById(id string) bool {
 	// Make the GET request to the /anime/:title endpoint
-	url := "http://localhost:8080/list/anime/" + id
+	url := GoDotEnvVariable("WEBSITE_URL") + "/list/anime/" + id
 	resp, err := http.Get(url)
 
 	// If there is an error or the status code is not 200 (OK), return false
