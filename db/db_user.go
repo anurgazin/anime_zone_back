@@ -34,6 +34,10 @@ func RegisterUser(user User) (interface{}, error) {
 	user.Password = password
 	user.ID = primitive.NewObjectID()
 
+	if user.Role != "admin" {
+		user.Role = "guest"
+	}
+
 	insertResult, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		fmt.Println(err)
