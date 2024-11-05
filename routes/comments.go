@@ -218,3 +218,15 @@ func GetCommentForContent(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, comment)
 }
+
+func GetCommentForUser(c *gin.Context) {
+	user_id := c.Param("id")
+
+	comment, err := database.GetAllCommentsForUser(user_id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, comment)
+}

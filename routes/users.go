@@ -84,3 +84,15 @@ func PutUser(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }
+
+func GetUser(c *gin.Context) {
+	id := c.Param("id")
+
+	user, err := database.GetUser(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, user)
+}

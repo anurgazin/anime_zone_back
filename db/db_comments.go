@@ -253,3 +253,30 @@ func GetAllCommentsForContent(content_type string, content_id string) ([]Comment
 	// Return the found comments
 	return result, nil
 }
+
+func GetAllCommentsForUser(user_id string) ([]Comment, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Comments")
+
+	c_id, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"user.user_id": c_id}
+
+	var result []Comment
+	cursor, err := collection.Find(context.TODO(), filter)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no comment found with the given user")
+		}
+		return nil, fmt.Errorf("error finding comments: %w", err)
+	}
+	if err = cursor.All(context.TODO(), &result); err != nil {
+		return nil, fmt.Errorf("error decoding comments: %w", err)
+	}
+	// Return the found comments
+	return result, nil
+}
