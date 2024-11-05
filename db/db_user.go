@@ -105,3 +105,28 @@ func EditUser(id string, updatedUser User) (interface{}, error) {
 	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
 	return result, nil
 }
+
+func GetUser(id string) (*User, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Users")
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+
+	var result User
+	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no user found with the given ID")
+		}
+		return nil, fmt.Errorf("error finding user: %w", err)
+	}
+
+	// Return the found user
+	return &result, nil
+}

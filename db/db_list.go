@@ -428,3 +428,57 @@ func GetAllCharacterListsByCharacterId(character_id string) ([]CharacterList, er
 	fmt.Println("Retrieved all characters lists with given character")
 	return result, nil
 }
+
+func GetAllAnimeListsByUserId(user_id string) ([]AnimeList, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("AnimeList")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"user.user_id": objID}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		panic(err)
+	}
+
+	var result []AnimeList
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all anime lists with given user id")
+	return result, nil
+}
+
+func GetAllCharacterListsByUserId(user_id string) ([]CharacterList, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("CharacterList")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"user.user_id": objID}
+	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		panic(err)
+	}
+
+	var result []CharacterList
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all characters lists with given user")
+	return result, nil
+}
