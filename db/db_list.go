@@ -9,21 +9,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateAnimeList(listName string, id string, username string) (interface{}, error) {
+func CreateAnimeList(list PostListRequest) (interface{}, error) {
 	var animeList AnimeList
 	var listUser ListUser
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 	animeList.ID = primitive.NewObjectID()
-	userId, err := primitive.ObjectIDFromHex(id)
+	userId, err := primitive.ObjectIDFromHex(list.UserId)
 	if err != nil {
 		return nil, fmt.Errorf("invalid UserId format: %w", err)
 	}
 	listUser.UserID = userId
-	listUser.Username = username
+	listUser.Username = list.Username
 	animeList.User = listUser
-	animeList.Name = listName
-	animeList.AnimeList = []primitive.ObjectID{}
+	animeList.Name = list.ListTitle
+	for _, a := range list.ContentList {
+		animeId, err := primitive.ObjectIDFromHex(a)
+		if err != nil {
+			return nil, fmt.Errorf("invalid AnimeId format: %w", err)
+		}
+		animeList.AnimeList = append(animeList.AnimeList, animeId)
+	}
 	insertResult, err := collection.InsertOne(context.TODO(), animeList)
 	if err != nil {
 		fmt.Println(err)
@@ -33,21 +39,27 @@ func CreateAnimeList(listName string, id string, username string) (interface{}, 
 	return insertResult.InsertedID, nil
 }
 
-func CreateCharacterList(listName string, id string, username string) (interface{}, error) {
+func CreateCharacterList(list PostListRequest) (interface{}, error) {
 	var characterList CharacterList
 	var listUser ListUser
 	client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 	characterList.ID = primitive.NewObjectID()
-	userId, err := primitive.ObjectIDFromHex(id)
+	userId, err := primitive.ObjectIDFromHex(list.UserId)
 	if err != nil {
 		return nil, fmt.Errorf("invalid UserId format: %w", err)
 	}
 	listUser.UserID = userId
-	listUser.Username = username
+	listUser.Username = list.Username
 	characterList.User = listUser
-	characterList.Name = listName
-	characterList.CharacterList = []primitive.ObjectID{}
+	characterList.Name = list.ListTitle
+	for _, c := range list.ContentList {
+		characterId, err := primitive.ObjectIDFromHex(c)
+		if err != nil {
+			return nil, fmt.Errorf("invalid AnimeId format: %w", err)
+		}
+		characterList.CharacterList = append(characterList.CharacterList, characterId)
+	}
 	insertResult, err := collection.InsertOne(context.TODO(), characterList)
 	if err != nil {
 		fmt.Println(err)

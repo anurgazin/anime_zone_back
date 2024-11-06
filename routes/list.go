@@ -8,13 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type PostListRequest struct {
-	ListTitle string `json:"title"`
-	UserId    string `json:"user_id"`
-}
-
 func PostAnimeList(c *gin.Context) {
-	var newAnimeList PostListRequest
+	var newAnimeList database.PostListRequest
 
 	id, exists := c.Get("id")
 	if !exists {
@@ -34,8 +29,9 @@ func PostAnimeList(c *gin.Context) {
 		return
 	}
 	newAnimeList.UserId = id.(string)
+	newAnimeList.Username = username.(string)
 
-	insertedID, err := database.CreateAnimeList(newAnimeList.ListTitle, newAnimeList.UserId, username.(string))
+	insertedID, err := database.CreateAnimeList(newAnimeList)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -45,7 +41,7 @@ func PostAnimeList(c *gin.Context) {
 }
 
 func PostCharacterList(c *gin.Context) {
-	var newCharacterList PostListRequest
+	var newCharacterList database.PostListRequest
 
 	id, exists := c.Get("id")
 	if !exists {
@@ -65,8 +61,9 @@ func PostCharacterList(c *gin.Context) {
 		return
 	}
 	newCharacterList.UserId = id.(string)
+	newCharacterList.Username = username.(string)
 
-	insertedID, err := database.CreateCharacterList(newCharacterList.ListTitle, newCharacterList.UserId, username.(string))
+	insertedID, err := database.CreateCharacterList(newCharacterList)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return

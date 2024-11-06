@@ -218,3 +218,10 @@ type CommentUploader struct {
 	Text      string      `bson:"text" json:"text"`
 	Rating    float64     `bson:"rating" json:"rating"`
 }
+
+type PostListRequest struct {
+	ListTitle   string   `json:"title"`
+	UserId      string   `json:"user_id"`
+	Username    string   `json:"username"`
+	ContentList []string `json:"content_list"`
+}
