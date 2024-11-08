@@ -79,7 +79,7 @@ func PostComment(c *gin.Context) {
 		ContentID: contentId,
 		User:      commentUser,
 		Text:      newCommentUploader.Text,
-		Rating:    newCommentUploader.Rating,
+		Rating:    0,
 	}
 
 	insertedID, err := database.UploadComment(newComment)
