@@ -86,17 +86,17 @@ type AnimeUploader struct {
 	ReleaseDate   time.Time               `bson:"release_date" json:"release_date" form:"release_date"` // ISO date string
 	AverageRating float64                 `bson:"average_rating" json:"average_rating"`                 // Average rating score
 	RatingCount   int                     `bson:"rating_count" json:"rating_count"`                     // Total number of ratings
-	Genre         []string                `bson:"genre" json:"genre" form:"genre"`
+	Genre         []string                `bson:"genre" json:"genre" form:"genre[]"`
 	Type          Type                    `bson:"type" json:"type" form:"type"`
 	Episodes      int                     `bson:"episodes" json:"episodes" form:"episodes"`
 	Description   string                  `bson:"description" json:"description" form:"description"`
-	Studio        []string                `bson:"studio" json:"studio" form:"studio"`
+	Studio        []string                `bson:"studio" json:"studio" form:"studio[]"`
 	Duration      int                     `bson:"duration" json:"duration" form:"duration"` // in minutes
 	Status        Status                  `bson:"status" json:"status" form:"status"`
 	ESRB          ESRB                    `bson:"esrb" json:"esrb" form:"esrb"`
 	Link          string                  `bson:"link" json:"link" form:"link"`
 	Logo          *multipart.FileHeader   `bson:"logo" json:"logo" form:"logo"`
-	Media         []*multipart.FileHeader `bson:"media" json:"media" form:"media"`
+	Media         []*multipart.FileHeader `bson:"media" json:"media" form:"media[]"`
 }
 
 // Filters struct represents the filters used to search for anime
