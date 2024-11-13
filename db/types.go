@@ -132,12 +132,12 @@ type CharacterUploader struct {
 	FirstName string                  `bson:"first_name" json:"first_name" form:"first_name"`
 	LastName  string                  `bson:"last_name" json:"last_name" form:"last_name"`
 	Age       int                     `bson:"age" json:"age" form:"age"`
-	FromAnime []string                `bson:"from_anime" json:"from_anime" form:"from_anime"`
+	FromAnime []string                `bson:"from_anime" json:"from_anime" form:"from_anime[]"`
 	Gender    string                  `bson:"gender" json:"gender" form:"gender"`
 	Bio       string                  `bson:"bio" json:"bio" form:"bio"`
 	Status    string                  `bson:"status" json:"status" form:"status"` // e.g., "alive", "dead", "unknown"
 	Logo      *multipart.FileHeader   `bson:"logo" json:"logo" form:"logo"`
-	Media     []*multipart.FileHeader `bson:"media" json:"media" form:"media"`
+	Media     []*multipart.FileHeader `bson:"media" json:"media" form:"media[]"`
 }
 
 // User struct represents User information
