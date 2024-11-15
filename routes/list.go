@@ -137,6 +137,7 @@ func AddCharacterToList(c *gin.Context) {
 	result, err := database.AddCharacterToList(newCharacterList.ListID, newCharacterList.UserID, newCharacterList.ObjectID)
 
 	if err != nil {
+		fmt.Println(err)
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
