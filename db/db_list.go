@@ -23,6 +23,7 @@ func CreateAnimeList(list PostListRequest) (interface{}, error) {
 	listUser.Username = list.Username
 	animeList.User = listUser
 	animeList.Name = list.ListTitle
+	animeList.AnimeList = []primitive.ObjectID{}
 	for _, a := range list.ContentList {
 		animeId, err := primitive.ObjectIDFromHex(a)
 		if err != nil {
@@ -53,6 +54,7 @@ func CreateCharacterList(list PostListRequest) (interface{}, error) {
 	listUser.Username = list.Username
 	characterList.User = listUser
 	characterList.Name = list.ListTitle
+	characterList.CharacterList = []primitive.ObjectID{}
 	for _, c := range list.ContentList {
 		characterId, err := primitive.ObjectIDFromHex(c)
 		if err != nil {
