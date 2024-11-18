@@ -154,3 +154,12 @@ func GetCharactersByAnimeId(g *gin.Context) {
 	}
 	g.IndentedJSON(http.StatusOK, character)
 }
+
+func GetCharactersFirstName(g *gin.Context) {
+	characters, err := database.GetCharactersFirstName()
+	if err != nil {
+		g.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve characters"})
+		return
+	}
+	g.IndentedJSON(http.StatusOK, characters)
+}

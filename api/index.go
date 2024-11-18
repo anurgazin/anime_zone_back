@@ -35,6 +35,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.PUT("/user/:id", middleware.AuthToken, routes.PutUser)
 
 	router.GET("/anime", routes.GetAnime)
+	router.GET("/anime/highest", routes.GetHighestRatedAnime)
+	router.GET("/anime/popular", routes.GetMostPopularAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)
 	router.GET("/anime/title/:title", routes.GetAnimeByTitle)
 	router.GET("/anime/rating/:id", routes.GetAnimeRatingById)
@@ -45,7 +47,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.DELETE("/anime/:id", middleware.AuthToken, middleware.IsAdmin, routes.DeleteAnime)
 
 	router.GET("/characters", routes.GetCharacters)
-	router.GET("/characters/:id", routes.GetCharactersById)
+	router.GET("/characters/name/asc", routes.GetCharactersFirstName)
+	router.GET("/characters/id/:id", routes.GetCharactersById)
 	router.GET("/characters/anime/:id", routes.GetCharactersByAnimeId)
 	router.POST("/characters", middleware.AuthToken, middleware.IsAdmin, routes.PostCharacters)
 	router.PUT("/characters/:id", middleware.AuthToken, middleware.IsAdmin, routes.PutCharacters)

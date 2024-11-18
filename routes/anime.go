@@ -186,3 +186,21 @@ func GetAnimeRatingByUser(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, anime)
 }
+
+func GetHighestRatedAnime(c *gin.Context) {
+	anime, err := database.GetHighestRatedAnime()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, anime)
+}
+
+func GetMostPopularAnime(c *gin.Context) {
+	anime, err := database.GetMostPopularAnime()
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, anime)
+}

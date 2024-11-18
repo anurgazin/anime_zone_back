@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func UploadAnime(anime Anime) (interface{}, error) {
@@ -343,5 +344,47 @@ func GetAnimeRatingByUserId(id string) ([]Rating, error) {
 	}
 
 	// Return the found anime
+	return result, nil
+}
+
+func GetHighestRatedAnime() ([]Anime, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Anime")
+
+	opts := options.Find().SetSort(bson.D{{Key: "average_rating", Value: -1}}).SetLimit(10)
+
+	cursor, err := collection.Find(context.TODO(), bson.D{}, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	var result []Anime
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all anime")
+	return result, nil
+}
+
+func GetMostPopularAnime() ([]Anime, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Anime")
+
+	opts := options.Find().SetSort(bson.D{{Key: "rating_count", Value: -1}}).SetLimit(10)
+
+	cursor, err := collection.Find(context.TODO(), bson.D{}, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	var result []Anime
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all anime")
 	return result, nil
 }
