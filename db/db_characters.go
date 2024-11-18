@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func UploadCharacter(character Character) (interface{}, error) {
@@ -163,6 +164,27 @@ func GetAllCharactersFromAnime(anime_id string) ([]Character, error) {
 	filter := bson.M{"from_anime.id": objID}
 
 	cursor, err := collection.Find(context.TODO(), filter)
+	if err != nil {
+		panic(err)
+	}
+
+	var result []Character
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all characters")
+	return result, nil
+}
+
+func GetCharactersFirstName() ([]Character, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Characters")
+
+	opts := options.Find().SetSort(bson.D{{Key: "last_name", Value: 1}}).SetLimit(10)
+
+	cursor, err := collection.Find(context.TODO(), bson.D{}, opts)
 	if err != nil {
 		panic(err)
 	}
