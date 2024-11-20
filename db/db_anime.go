@@ -4,6 +4,7 @@ import (
 	azureblob "anime_zone/back_end/azure_blob"
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -386,5 +387,53 @@ func GetMostPopularAnime() ([]Anime, error) {
 	}
 
 	fmt.Println("Retrieved all anime")
+	return result, nil
+}
+
+func GetSimilarAnime(genres []string, studios []string, id string) ([]Anime, error) {
+	client := RunMongo()
+	collection := client.Database("Anime-Zone").Collection("Anime")
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	tmp_len := float64(len(genres)) / 2
+
+	genres_len := math.Round(tmp_len)
+
+	filter := bson.M{
+		"_id": bson.M{"$ne": objID},
+		"$or": []bson.M{
+			{
+				"$expr": bson.M{
+					"$gte": []interface{}{
+						bson.M{
+							"$size": bson.M{
+								"$setIntersection": []interface{}{"$genre", genres},
+							},
+						},
+						genres_len, // At least half of the genres
+					},
+				},
+			},
+			{"studio": bson.M{"$in": studios}}, // At least one studio
+		},
+	}
+
+	opts := options.Find().SetSort(bson.D{{Key: "rating_count", Value: -1}}).SetLimit(10)
+
+	cursor, err := collection.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find similar anime: %w", err)
+	}
+
+	var result []Anime
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		return nil, fmt.Errorf("failed to decode similar anime: %w", err)
+	}
+
+	fmt.Println("Retrieved similar anime")
 	return result, nil
 }
