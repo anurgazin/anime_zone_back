@@ -36,6 +36,7 @@ func main() {
 	router.GET("/anime", routes.GetAnime)
 	router.GET("/anime/highest", routes.GetHighestRatedAnime)
 	router.GET("/anime/popular", routes.GetMostPopularAnime)
+	router.GET("/anime/similar/:id", routes.GetSimilarAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)
 	router.GET("/anime/title/:title", routes.GetAnimeByTitle)
 	router.GET("/anime/rating/:id", routes.GetAnimeRatingById)

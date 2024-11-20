@@ -38,6 +38,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.GET("/anime/highest", routes.GetHighestRatedAnime)
 	router.GET("/anime/popular", routes.GetMostPopularAnime)
 	router.GET("/anime/id/:id", routes.GetAnimeById)
+	router.GET("/anime/similar/:id", routes.GetSimilarAnime)
 	router.GET("/anime/title/:title", routes.GetAnimeByTitle)
 	router.GET("/anime/rating/:id", routes.GetAnimeRatingById)
 	router.GET("/anime/rating/user/:id", routes.GetAnimeRatingByUser)

@@ -204,3 +204,22 @@ func GetMostPopularAnime(c *gin.Context) {
 	}
 	c.IndentedJSON(http.StatusOK, anime)
 }
+
+func GetSimilarAnime(c *gin.Context) {
+	id := c.Param("id")
+
+	anime, err := database.GetAnimeById(id)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	result, err := database.GetSimilarAnime(anime.Genre, anime.Studio, id)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, result)
+}
