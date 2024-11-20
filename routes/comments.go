@@ -8,9 +8,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func PostComment(c *gin.Context) {
+func PostComment(c *gin.Context, client *mongo.Client) {
 	var newComment database.Comment
 	var newCommentUploader database.CommentUploader
 
@@ -82,7 +83,7 @@ func PostComment(c *gin.Context) {
 		Rating:    0,
 	}
 
-	insertedID, err := database.UploadComment(newComment)
+	insertedID, err := database.UploadComment(newComment, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -91,8 +92,8 @@ func PostComment(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, result)
 }
 
-func GetAllComments(c *gin.Context) {
-	comments, err := database.GetAllComments()
+func GetAllComments(c *gin.Context, client *mongo.Client) {
+	comments, err := database.GetAllComments(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comments"})
 		return
@@ -100,10 +101,10 @@ func GetAllComments(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, comments)
 }
 
-func GetCommentByType(c *gin.Context) {
+func GetCommentByType(c *gin.Context, client *mongo.Client) {
 	content_type := c.Param("type")
 
-	comment, err := database.GetAllByTypeComments(content_type)
+	comment, err := database.GetAllByTypeComments(content_type, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -112,10 +113,10 @@ func GetCommentByType(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, comment)
 }
 
-func GetCommentById(c *gin.Context) {
+func GetCommentById(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	comment, err := database.GetCommentById(id)
+	comment, err := database.GetCommentById(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -124,7 +125,7 @@ func GetCommentById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, comment)
 }
 
-func DeleteComment(c *gin.Context) {
+func DeleteComment(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 	role, exists := c.Get("role")
 	if !exists {
@@ -139,7 +140,7 @@ func DeleteComment(c *gin.Context) {
 		return
 	}
 
-	result, err := database.DeleteComment(id, user_id.(string), role.(string))
+	result, err := database.DeleteComment(id, user_id.(string), role.(string), client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -152,7 +153,7 @@ type UpdateCommentText struct {
 	Text string `bson:"text" json:"text"`
 }
 
-func UpdateComment(c *gin.Context) {
+func UpdateComment(c *gin.Context, client *mongo.Client) {
 	var newText UpdateCommentText
 	id := c.Param("id")
 	user_id, exists := c.Get("id")
@@ -165,7 +166,7 @@ func UpdateComment(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid text"})
 		return
 	}
-	result, err := database.UpdateComment(id, user_id.(string), newText.Text)
+	result, err := database.UpdateComment(id, user_id.(string), newText.Text, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -177,7 +178,7 @@ type UpdateRatingAction struct {
 	Action string `json:"action" form:"action"` // "increment" or "decrement"
 }
 
-func UpdateCommentRating(c *gin.Context) {
+func UpdateCommentRating(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 	var updateData UpdateRatingAction
 
@@ -197,7 +198,7 @@ func UpdateCommentRating(c *gin.Context) {
 		return
 	}
 
-	result, err := database.UpdateCommentRating(id, incrementValue)
+	result, err := database.UpdateCommentRating(id, incrementValue, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update comment rating or comment not found"})
 		return
@@ -206,11 +207,11 @@ func UpdateCommentRating(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Comment rating updated successfully"})
 }
 
-func GetCommentForContent(c *gin.Context) {
+func GetCommentForContent(c *gin.Context, client *mongo.Client) {
 	content_type := c.Param("type")
 	content_id := c.Param("id")
 
-	comment, err := database.GetAllCommentsForContent(content_type, content_id)
+	comment, err := database.GetAllCommentsForContent(content_type, content_id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -219,10 +220,10 @@ func GetCommentForContent(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, comment)
 }
 
-func GetCommentForUser(c *gin.Context) {
+func GetCommentForUser(c *gin.Context, client *mongo.Client) {
 	user_id := c.Param("id")
 
-	comment, err := database.GetAllCommentsForUser(user_id)
+	comment, err := database.GetAllCommentsForUser(user_id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})

@@ -6,9 +6,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func PostAnimeList(c *gin.Context) {
+func PostAnimeList(c *gin.Context, client *mongo.Client) {
 	var newAnimeList database.PostListRequest
 
 	id, exists := c.Get("id")
@@ -31,7 +32,7 @@ func PostAnimeList(c *gin.Context) {
 	newAnimeList.UserId = id.(string)
 	newAnimeList.Username = username.(string)
 
-	insertedID, err := database.CreateAnimeList(newAnimeList)
+	insertedID, err := database.CreateAnimeList(newAnimeList, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -40,7 +41,7 @@ func PostAnimeList(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, result)
 }
 
-func PostCharacterList(c *gin.Context) {
+func PostCharacterList(c *gin.Context, client *mongo.Client) {
 	var newCharacterList database.PostListRequest
 
 	id, exists := c.Get("id")
@@ -63,7 +64,7 @@ func PostCharacterList(c *gin.Context) {
 	newCharacterList.UserId = id.(string)
 	newCharacterList.Username = username.(string)
 
-	insertedID, err := database.CreateCharacterList(newCharacterList)
+	insertedID, err := database.CreateCharacterList(newCharacterList, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -78,7 +79,7 @@ type AddToListRequest struct {
 	ObjectID string `json:"object_id"`
 }
 
-func AddAnimeToList(c *gin.Context) {
+func AddAnimeToList(c *gin.Context, client *mongo.Client) {
 	var newAnimeList AddToListRequest
 
 	uID, exists := c.Get("id")
@@ -101,7 +102,7 @@ func AddAnimeToList(c *gin.Context) {
 	newAnimeList.UserID = uID.(string)
 	newAnimeList.ListID = lID
 
-	result, err := database.AddAnimeToList(newAnimeList.ListID, newAnimeList.UserID, newAnimeList.ObjectID)
+	result, err := database.AddAnimeToList(newAnimeList.ListID, newAnimeList.UserID, newAnimeList.ObjectID, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -111,7 +112,7 @@ func AddAnimeToList(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }
 
-func AddCharacterToList(c *gin.Context) {
+func AddCharacterToList(c *gin.Context, client *mongo.Client) {
 	var newCharacterList AddToListRequest
 
 	uID, exists := c.Get("id")
@@ -134,7 +135,7 @@ func AddCharacterToList(c *gin.Context) {
 	newCharacterList.UserID = uID.(string)
 	newCharacterList.ListID = lID
 
-	result, err := database.AddCharacterToList(newCharacterList.ListID, newCharacterList.UserID, newCharacterList.ObjectID)
+	result, err := database.AddCharacterToList(newCharacterList.ListID, newCharacterList.UserID, newCharacterList.ObjectID, client)
 
 	if err != nil {
 		fmt.Println(err)
@@ -145,8 +146,8 @@ func AddCharacterToList(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }
 
-func GetAnimeLists(c *gin.Context) {
-	animeList, err := database.GetAllAnimeLists()
+func GetAnimeLists(c *gin.Context, client *mongo.Client) {
+	animeList, err := database.GetAllAnimeLists(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime lists"})
 		return
@@ -154,8 +155,8 @@ func GetAnimeLists(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, animeList)
 }
 
-func GetCharacterLists(c *gin.Context) {
-	characterList, err := database.GetAllCharacterLists()
+func GetCharacterLists(c *gin.Context, client *mongo.Client) {
+	characterList, err := database.GetAllCharacterLists(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve character lists"})
 		return
@@ -163,10 +164,10 @@ func GetCharacterLists(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, characterList)
 }
 
-func GetAnimeListById(c *gin.Context) {
+func GetAnimeListById(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	animeList, err := database.GetAnimeListById(id)
+	animeList, err := database.GetAnimeListById(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -175,10 +176,10 @@ func GetAnimeListById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, animeList)
 }
 
-func GetCharacterListById(c *gin.Context) {
+func GetCharacterListById(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	characterList, err := database.GetCharacterListById(id)
+	characterList, err := database.GetCharacterListById(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -191,7 +192,7 @@ type UpdateList struct {
 	Name string `bson:"name" json:"name"`
 }
 
-func EditAnimeList(c *gin.Context) {
+func EditAnimeList(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 	var updateAnimeList UpdateList
 
@@ -207,7 +208,7 @@ func EditAnimeList(c *gin.Context) {
 		return
 	}
 
-	result, err := database.UpdateAnimeList(id, user_id.(string), updateAnimeList.Name)
+	result, err := database.UpdateAnimeList(id, user_id.(string), updateAnimeList.Name, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -216,7 +217,7 @@ func EditAnimeList(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, result)
 }
 
-func EditCharacterList(c *gin.Context) {
+func EditCharacterList(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 	var updateCharList UpdateList
 
@@ -232,7 +233,7 @@ func EditCharacterList(c *gin.Context) {
 		return
 	}
 
-	result, err := database.UpdateCharacterList(id, user_id.(string), updateCharList.Name)
+	result, err := database.UpdateCharacterList(id, user_id.(string), updateCharList.Name, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -245,7 +246,7 @@ type UpdateListRatingAction struct {
 	Action string `json:"action" form:"action"` // "increment" or "decrement"
 }
 
-func UpdateAnimeListRating(c *gin.Context) {
+func UpdateAnimeListRating(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 	var updateData UpdateListRatingAction
 
@@ -265,7 +266,7 @@ func UpdateAnimeListRating(c *gin.Context) {
 		return
 	}
 
-	_, err := database.UpdateAnimeListRating(id, incrementValue)
+	_, err := database.UpdateAnimeListRating(id, incrementValue, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update anime list rating or anime list not found"})
 		return
@@ -273,7 +274,7 @@ func UpdateAnimeListRating(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Anime List rating updated successfully"})
 }
 
-func UpdateCharacterListRating(c *gin.Context) {
+func UpdateCharacterListRating(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 	var updateData UpdateListRatingAction
 
@@ -293,7 +294,7 @@ func UpdateCharacterListRating(c *gin.Context) {
 		return
 	}
 
-	_, err := database.UpdateCharacterListRating(id, incrementValue)
+	_, err := database.UpdateCharacterListRating(id, incrementValue, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update character list rating or character list not found"})
 		return
@@ -301,10 +302,10 @@ func UpdateCharacterListRating(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Character List rating updated successfully"})
 }
 
-func GetAnimeListsByAnimeId(c *gin.Context) {
+func GetAnimeListsByAnimeId(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	animeList, err := database.GetAllAnimeListsByAnimeId(id)
+	animeList, err := database.GetAllAnimeListsByAnimeId(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -313,10 +314,10 @@ func GetAnimeListsByAnimeId(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, animeList)
 }
 
-func GetCharacterListsByCharacterId(c *gin.Context) {
+func GetCharacterListsByCharacterId(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	animeList, err := database.GetAllCharacterListsByCharacterId(id)
+	animeList, err := database.GetAllCharacterListsByCharacterId(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -325,10 +326,10 @@ func GetCharacterListsByCharacterId(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, animeList)
 }
 
-func GetAnimeListsByUserId(c *gin.Context) {
+func GetAnimeListsByUserId(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	animeList, err := database.GetAllAnimeListsByUserId(id)
+	animeList, err := database.GetAllAnimeListsByUserId(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -337,10 +338,10 @@ func GetAnimeListsByUserId(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, animeList)
 }
 
-func GetCharacterListsByUserId(c *gin.Context) {
+func GetCharacterListsByUserId(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	animeList, err := database.GetAllCharacterListsByUserId(id)
+	animeList, err := database.GetAllCharacterListsByUserId(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})

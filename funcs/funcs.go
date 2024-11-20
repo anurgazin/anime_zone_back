@@ -109,7 +109,7 @@ func CheckAnimeExistsById(id string) bool {
 // Function to check if an anime exists by making a GET request to /anime/:title
 func CheckCharactersExistsById(id string) bool {
 	// Make the GET request to the /anime/:title endpoint
-	url := GoDotEnvVariable("WEBSITE_URL") + "/characters/" + id
+	url := GoDotEnvVariable("WEBSITE_URL") + "/characters/id/" + id
 	resp, err := http.Get(url)
 
 	// If there is an error or the status code is not 200 (OK), return false

@@ -13,10 +13,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetCharacters(g *gin.Context) {
-	characters, err := database.GetAllCharacters()
+func GetCharacters(g *gin.Context, client *mongo.Client) {
+	characters, err := database.GetAllCharacters(client)
 	if err != nil {
 		g.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve characters"})
 		return
@@ -24,9 +25,9 @@ func GetCharacters(g *gin.Context) {
 	g.IndentedJSON(http.StatusOK, characters)
 }
 
-func GetCharactersById(g *gin.Context) {
+func GetCharactersById(g *gin.Context, client *mongo.Client) {
 	id := g.Param("id")
-	character, err := database.GetCharacterById(id)
+	character, err := database.GetCharacterById(id, client)
 
 	if err != nil {
 		g.IndentedJSON(http.StatusNotFound, gin.H{"message": "character not found"})
@@ -35,7 +36,7 @@ func GetCharactersById(g *gin.Context) {
 	g.IndentedJSON(http.StatusOK, character)
 }
 
-func PostCharacters(g *gin.Context) {
+func PostCharacters(g *gin.Context, client *mongo.Client) {
 	var newCharacter database.Character
 	var newCharacterUploader database.CharacterUploader
 
@@ -50,7 +51,7 @@ func PostCharacters(g *gin.Context) {
 	var fromAnime = []database.FromAnime{}
 	for _, s_id := range newCharacterUploader.FromAnime {
 		var a database.FromAnime
-		res, err := database.GetAnimeById(s_id)
+		res, err := database.GetAnimeById(s_id, client)
 		if err != nil {
 			// If any anime doesn't exist, return an error message
 			g.JSON(http.StatusBadRequest, gin.H{"error": "Such Anime doesn't exist in our db: " + s_id})
@@ -95,7 +96,7 @@ func PostCharacters(g *gin.Context) {
 		Media:     mediaURLs,
 	}
 
-	insertedID, err := database.UploadCharacter(newCharacter)
+	insertedID, err := database.UploadCharacter(newCharacter, client)
 	if err != nil {
 		g.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -104,7 +105,7 @@ func PostCharacters(g *gin.Context) {
 	g.IndentedJSON(http.StatusCreated, result)
 }
 
-func PutCharacters(g *gin.Context) {
+func PutCharacters(g *gin.Context, client *mongo.Client) {
 	var updatedCharacter database.Character
 	id := g.Param("id")
 
@@ -123,7 +124,7 @@ func PutCharacters(g *gin.Context) {
 		}
 	}
 
-	result, err := database.UpdateCharacter(id, updatedCharacter)
+	result, err := database.UpdateCharacter(id, updatedCharacter, client)
 
 	if err != nil {
 		g.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -133,9 +134,9 @@ func PutCharacters(g *gin.Context) {
 	g.IndentedJSON(http.StatusNotFound, gin.H{"message": result})
 }
 
-func DeleteCharacter(g *gin.Context) {
+func DeleteCharacter(g *gin.Context, client *mongo.Client) {
 	id := g.Param("id")
-	character, err := database.DeleteCharacter(id)
+	character, err := database.DeleteCharacter(id, client)
 
 	if err != nil {
 		g.IndentedJSON(http.StatusNotFound, gin.H{"message": err})
@@ -144,9 +145,9 @@ func DeleteCharacter(g *gin.Context) {
 	g.IndentedJSON(http.StatusOK, character)
 }
 
-func GetCharactersByAnimeId(g *gin.Context) {
+func GetCharactersByAnimeId(g *gin.Context, client *mongo.Client) {
 	id := g.Param("id")
-	character, err := database.GetAllCharactersFromAnime(id)
+	character, err := database.GetAllCharactersFromAnime(id, client)
 
 	if err != nil {
 		g.IndentedJSON(http.StatusNotFound, gin.H{"message": "character not found"})
@@ -155,8 +156,8 @@ func GetCharactersByAnimeId(g *gin.Context) {
 	g.IndentedJSON(http.StatusOK, character)
 }
 
-func GetCharactersFirstName(g *gin.Context) {
-	characters, err := database.GetCharactersFirstName()
+func GetCharactersFirstName(g *gin.Context, client *mongo.Client) {
+	characters, err := database.GetCharactersFirstName(client)
 	if err != nil {
 		g.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve characters"})
 		return

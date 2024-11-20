@@ -10,8 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func UploadComment(comment Comment) (interface{}, error) {
-	client := RunMongo()
+func UploadComment(comment Comment, client *mongo.Client) (interface{}, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 	comment.ID = primitive.NewObjectID()
 	comment.Timestamp = time.Now()
@@ -24,8 +24,8 @@ func UploadComment(comment Comment) (interface{}, error) {
 	return insertResult.InsertedID, nil
 }
 
-func GetAllComments() ([]Comment, error) {
-	client := RunMongo()
+func GetAllComments(client *mongo.Client) ([]Comment, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
@@ -43,8 +43,8 @@ func GetAllComments() ([]Comment, error) {
 	return result, nil
 }
 
-func GetAllByTypeComments(content_type string) ([]Comment, error) {
-	client := RunMongo()
+func GetAllByTypeComments(content_type string, client *mongo.Client) ([]Comment, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	c_type := CommentType(content_type)
@@ -67,8 +67,8 @@ func GetAllByTypeComments(content_type string) ([]Comment, error) {
 	return result, nil
 }
 
-func GetCommentById(id string) (*Comment, error) {
-	client := RunMongo()
+func GetCommentById(id string, client *mongo.Client) (*Comment, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -92,8 +92,8 @@ func GetCommentById(id string) (*Comment, error) {
 	return &result, nil
 }
 
-func DeleteComment(id string, user_id string, user_role string) (interface{}, error) {
-	client := RunMongo()
+func DeleteComment(id string, user_id string, user_role string, client *mongo.Client) (interface{}, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -109,7 +109,7 @@ func DeleteComment(id string, user_id string, user_role string) (interface{}, er
 	}
 
 	filter := bson.M{"_id": objID}
-	commentData, err := GetCommentById(id)
+	commentData, err := GetCommentById(id, client)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +134,8 @@ func DeleteComment(id string, user_id string, user_role string) (interface{}, er
 	return result, nil
 }
 
-func UpdateComment(id string, user_id string, text string) (interface{}, error) {
-	client := RunMongo()
+func UpdateComment(id string, user_id string, text string, client *mongo.Client) (interface{}, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -149,7 +149,7 @@ func UpdateComment(id string, user_id string, text string) (interface{}, error) 
 	if err != nil {
 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
 	}
-	commentData, err := GetCommentById(id)
+	commentData, err := GetCommentById(id, client)
 	if err != nil {
 		return nil, err
 	}
@@ -178,8 +178,8 @@ func UpdateComment(id string, user_id string, text string) (interface{}, error) 
 }
 
 // function to delete comments which content was deleted
-func DeleteCommentByContentId(content_id string, content_type string) (interface{}, error) {
-	client := RunMongo()
+func DeleteCommentByContentId(content_id string, content_type string, client *mongo.Client) (interface{}, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -200,8 +200,8 @@ func DeleteCommentByContentId(content_id string, content_type string) (interface
 	return result, nil
 }
 
-func UpdateCommentRating(id string, value float64) (interface{}, error) {
-	client := RunMongo()
+func UpdateCommentRating(id string, value float64, client *mongo.Client) (interface{}, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -226,8 +226,8 @@ func UpdateCommentRating(id string, value float64) (interface{}, error) {
 	return result, nil
 }
 
-func GetAllCommentsForContent(content_type string, content_id string) ([]Comment, error) {
-	client := RunMongo()
+func GetAllCommentsForContent(content_type string, content_id string, client *mongo.Client) ([]Comment, error) {
+	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	c_type := CommentType(content_type)
@@ -254,8 +254,8 @@ func GetAllCommentsForContent(content_type string, content_id string) ([]Comment
 	return result, nil
 }
 
-func GetAllCommentsForUser(user_id string) ([]Comment, error) {
-	client := RunMongo()
+func GetAllCommentsForUser(user_id string, client *mongo.Client) ([]Comment, error) {
+	//client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	c_id, err := primitive.ObjectIDFromHex(user_id)
