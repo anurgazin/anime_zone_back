@@ -12,7 +12,6 @@ import (
 )
 
 func UploadCharacter(character Character, client *mongo.Client) (interface{}, error) {
-	//client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Characters")
 	character.ID = primitive.NewObjectID()
 	insertResult, err := collection.InsertOne(context.TODO(), character)
@@ -25,7 +24,6 @@ func UploadCharacter(character Character, client *mongo.Client) (interface{}, er
 }
 
 func GetAllCharacters(client *mongo.Client) ([]Character, error) {
-	//client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
@@ -44,7 +42,6 @@ func GetAllCharacters(client *mongo.Client) ([]Character, error) {
 }
 
 func GetCharacterById(id string, client *mongo.Client) (*Character, error) {
-	//client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -69,7 +66,6 @@ func GetCharacterById(id string, client *mongo.Client) (*Character, error) {
 }
 
 func UpdateCharacter(id string, updatedCharacter Character, client *mongo.Client) (interface{}, error) {
-	//client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	// Convert the string ID to ObjectID
@@ -107,7 +103,6 @@ func UpdateCharacter(id string, updatedCharacter Character, client *mongo.Client
 }
 
 func DeleteCharacter(id string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	// Convert the string ID to ObjectID
@@ -152,7 +147,6 @@ func DeleteCharacter(id string, client *mongo.Client) (interface{}, error) {
 }
 
 func GetAllCharactersFromAnime(anime_id string, client *mongo.Client) ([]Character, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	// Convert the string ID to ObjectID
@@ -179,7 +173,6 @@ func GetAllCharactersFromAnime(anime_id string, client *mongo.Client) ([]Charact
 }
 
 func GetCharactersFirstName(client *mongo.Client) ([]Character, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	opts := options.Find().SetSort(bson.D{{Key: "last_name", Value: 1}}).SetLimit(10)

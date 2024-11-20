@@ -11,7 +11,6 @@ import (
 )
 
 func UploadComment(comment Comment, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 	comment.ID = primitive.NewObjectID()
 	comment.Timestamp = time.Now()
@@ -25,7 +24,6 @@ func UploadComment(comment Comment, client *mongo.Client) (interface{}, error) {
 }
 
 func GetAllComments(client *mongo.Client) ([]Comment, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
@@ -44,7 +42,6 @@ func GetAllComments(client *mongo.Client) ([]Comment, error) {
 }
 
 func GetAllByTypeComments(content_type string, client *mongo.Client) ([]Comment, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	c_type := CommentType(content_type)
@@ -68,7 +65,6 @@ func GetAllByTypeComments(content_type string, client *mongo.Client) ([]Comment,
 }
 
 func GetCommentById(id string, client *mongo.Client) (*Comment, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -93,7 +89,6 @@ func GetCommentById(id string, client *mongo.Client) (*Comment, error) {
 }
 
 func DeleteComment(id string, user_id string, user_role string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -135,7 +130,6 @@ func DeleteComment(id string, user_id string, user_role string, client *mongo.Cl
 }
 
 func UpdateComment(id string, user_id string, text string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -179,7 +173,6 @@ func UpdateComment(id string, user_id string, text string, client *mongo.Client)
 
 // function to delete comments which content was deleted
 func DeleteCommentByContentId(content_id string, content_type string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -201,7 +194,6 @@ func DeleteCommentByContentId(content_id string, content_type string, client *mo
 }
 
 func UpdateCommentRating(id string, value float64, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
@@ -227,7 +219,6 @@ func UpdateCommentRating(id string, value float64, client *mongo.Client) (interf
 }
 
 func GetAllCommentsForContent(content_type string, content_id string, client *mongo.Client) ([]Comment, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	c_type := CommentType(content_type)
@@ -255,7 +246,6 @@ func GetAllCommentsForContent(content_type string, content_id string, client *mo
 }
 
 func GetAllCommentsForUser(user_id string, client *mongo.Client) ([]Comment, error) {
-	//client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Comments")
 
 	c_id, err := primitive.ObjectIDFromHex(user_id)

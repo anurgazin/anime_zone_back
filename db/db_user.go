@@ -23,7 +23,6 @@ func VerifyPassword(password, hash string) bool {
 }
 
 func RegisterUser(user User, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Users")
 	pwd := user.Password
 	password, err := HashPassword(pwd)
@@ -48,7 +47,6 @@ func RegisterUser(user User, client *mongo.Client) (interface{}, error) {
 }
 
 func LoginUser(email string, password string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Users")
 	filter := bson.M{"email": email}
 
@@ -69,7 +67,6 @@ func LoginUser(email string, password string, client *mongo.Client) (interface{}
 }
 
 func EditUser(id string, updatedUser User, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Users")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -107,7 +104,6 @@ func EditUser(id string, updatedUser User, client *mongo.Client) (interface{}, e
 }
 
 func GetUser(id string, client *mongo.Client) (*User, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Users")
 
 	objID, err := primitive.ObjectIDFromHex(id)

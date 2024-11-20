@@ -12,7 +12,6 @@ import (
 func CreateAnimeList(list PostListRequest, client *mongo.Client) (interface{}, error) {
 	var animeList AnimeList
 	var listUser ListUser
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 	animeList.ID = primitive.NewObjectID()
 	userId, err := primitive.ObjectIDFromHex(list.UserId)
@@ -43,7 +42,6 @@ func CreateAnimeList(list PostListRequest, client *mongo.Client) (interface{}, e
 func CreateCharacterList(list PostListRequest, client *mongo.Client) (interface{}, error) {
 	var characterList CharacterList
 	var listUser ListUser
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 	characterList.ID = primitive.NewObjectID()
 	userId, err := primitive.ObjectIDFromHex(list.UserId)
@@ -72,7 +70,6 @@ func CreateCharacterList(list PostListRequest, client *mongo.Client) (interface{
 }
 
 func AddAnimeToList(listId string, userId string, animeId string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	uID, err := primitive.ObjectIDFromHex(userId)
@@ -118,7 +115,6 @@ func AddAnimeToList(listId string, userId string, animeId string, client *mongo.
 }
 
 func AddCharacterToList(listId string, userId string, characterId string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	uID, err := primitive.ObjectIDFromHex(userId)
@@ -164,7 +160,6 @@ func AddCharacterToList(listId string, userId string, characterId string, client
 }
 
 func GetAllAnimeLists(client *mongo.Client) ([]AnimeList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
@@ -183,7 +178,6 @@ func GetAllAnimeLists(client *mongo.Client) ([]AnimeList, error) {
 }
 
 func GetAllCharacterLists(client *mongo.Client) ([]CharacterList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
@@ -202,7 +196,6 @@ func GetAllCharacterLists(client *mongo.Client) ([]CharacterList, error) {
 }
 
 func GetAnimeListById(id string, client *mongo.Client) (*AnimeList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -227,7 +220,6 @@ func GetAnimeListById(id string, client *mongo.Client) (*AnimeList, error) {
 }
 
 func GetCharacterListById(id string, client *mongo.Client) (*CharacterList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -252,7 +244,6 @@ func GetCharacterListById(id string, client *mongo.Client) (*CharacterList, erro
 }
 
 func UpdateAnimeList(id string, user_id string, text string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	// Convert the string ID to ObjectID
@@ -295,7 +286,6 @@ func UpdateAnimeList(id string, user_id string, text string, client *mongo.Clien
 }
 
 func UpdateCharacterList(id string, user_id string, text string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	// Convert the string ID to ObjectID
@@ -338,7 +328,6 @@ func UpdateCharacterList(id string, user_id string, text string, client *mongo.C
 }
 
 func UpdateAnimeListRating(id string, value float64, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	// Convert the string ID to ObjectID
@@ -390,7 +379,6 @@ func UpdateCharacterListRating(id string, value float64, client *mongo.Client) (
 }
 
 func GetAllAnimeListsByAnimeId(anime_id string, client *mongo.Client) ([]AnimeList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	// Convert the string ID to ObjectID
@@ -417,7 +405,6 @@ func GetAllAnimeListsByAnimeId(anime_id string, client *mongo.Client) ([]AnimeLi
 }
 
 func GetAllCharacterListsByCharacterId(character_id string, client *mongo.Client) ([]CharacterList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	// Convert the string ID to ObjectID
@@ -444,7 +431,6 @@ func GetAllCharacterListsByCharacterId(character_id string, client *mongo.Client
 }
 
 func GetAllAnimeListsByUserId(user_id string, client *mongo.Client) ([]AnimeList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	// Convert the string ID to ObjectID
@@ -471,7 +457,6 @@ func GetAllAnimeListsByUserId(user_id string, client *mongo.Client) ([]AnimeList
 }
 
 func GetAllCharacterListsByUserId(user_id string, client *mongo.Client) ([]CharacterList, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	// Convert the string ID to ObjectID

@@ -14,7 +14,6 @@ import (
 )
 
 func UploadAnime(anime Anime, client *mongo.Client) (interface{}, error) {
-	//client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	anime.ID = primitive.NewObjectID()
@@ -31,7 +30,6 @@ func UploadAnime(anime Anime, client *mongo.Client) (interface{}, error) {
 }
 
 func GetAllAnime(client *mongo.Client) ([]Anime, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
@@ -50,7 +48,6 @@ func GetAllAnime(client *mongo.Client) ([]Anime, error) {
 }
 
 func GetAnimeById(id string, client *mongo.Client) (*Anime, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -75,7 +72,6 @@ func GetAnimeById(id string, client *mongo.Client) (*Anime, error) {
 }
 
 func GetAnimeByTitle(title string, client *mongo.Client) (*Anime, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	filter := bson.M{"title": title}
@@ -95,7 +91,6 @@ func GetAnimeByTitle(title string, client *mongo.Client) (*Anime, error) {
 }
 
 func UpdateAnime(id string, updatedAnime Anime, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	// Convert the string ID to ObjectID
@@ -139,7 +134,6 @@ func UpdateAnime(id string, updatedAnime Anime, client *mongo.Client) (interface
 }
 
 func DeleteAnime(id string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	anime_collection := client.Database("Anime-Zone").Collection("Anime")
 	character_collection := client.Database("Anime-Zone").Collection("Characters")
 
@@ -208,7 +202,6 @@ func DeleteAnime(id string, client *mongo.Client) (interface{}, error) {
 }
 
 func PostRating(anime_id string, user_id string, username string, score float64, review string, client *mongo.Client) (interface{}, error) {
-	// client := RunMongo()
 	rating_collection := client.Database("Anime-Zone").Collection("Rating")
 	anime_collection := client.Database("Anime-Zone").Collection("Anime")
 
@@ -319,7 +312,6 @@ func GetAnimeRatingById(id string, client *mongo.Client) ([]Rating, error) {
 }
 
 func GetAnimeRatingByUserId(id string, client *mongo.Client) ([]Rating, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Rating")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -349,7 +341,6 @@ func GetAnimeRatingByUserId(id string, client *mongo.Client) ([]Rating, error) {
 }
 
 func GetHighestRatedAnime(client *mongo.Client) ([]Anime, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	opts := options.Find().SetSort(bson.D{{Key: "average_rating", Value: -1}}).SetLimit(10)
@@ -370,7 +361,6 @@ func GetHighestRatedAnime(client *mongo.Client) ([]Anime, error) {
 }
 
 func GetMostPopularAnime(client *mongo.Client) ([]Anime, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	opts := options.Find().SetSort(bson.D{{Key: "rating_count", Value: -1}}).SetLimit(10)
@@ -391,7 +381,6 @@ func GetMostPopularAnime(client *mongo.Client) ([]Anime, error) {
 }
 
 func GetSimilarAnime(genres []string, studios []string, id string, client *mongo.Client) ([]Anime, error) {
-	// client := RunMongo()
 	collection := client.Database("Anime-Zone").Collection("Anime")
 
 	objID, err := primitive.ObjectIDFromHex(id)
