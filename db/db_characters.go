@@ -11,8 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func UploadCharacter(character Character) (interface{}, error) {
-	client := RunMongo()
+func UploadCharacter(character Character, client *mongo.Client) (interface{}, error) {
 	collection := client.Database("Anime-Zone").Collection("Characters")
 	character.ID = primitive.NewObjectID()
 	insertResult, err := collection.InsertOne(context.TODO(), character)
@@ -24,8 +23,7 @@ func UploadCharacter(character Character) (interface{}, error) {
 	return insertResult.InsertedID, nil
 }
 
-func GetAllCharacters() ([]Character, error) {
-	client := RunMongo()
+func GetAllCharacters(client *mongo.Client) ([]Character, error) {
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
@@ -43,8 +41,7 @@ func GetAllCharacters() ([]Character, error) {
 	return result, nil
 }
 
-func GetCharacterById(id string) (*Character, error) {
-	client := RunMongo()
+func GetCharacterById(id string, client *mongo.Client) (*Character, error) {
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -68,8 +65,7 @@ func GetCharacterById(id string) (*Character, error) {
 	return &result, nil
 }
 
-func UpdateCharacter(id string, updatedCharacter Character) (interface{}, error) {
-	client := RunMongo()
+func UpdateCharacter(id string, updatedCharacter Character, client *mongo.Client) (interface{}, error) {
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	// Convert the string ID to ObjectID
@@ -106,8 +102,7 @@ func UpdateCharacter(id string, updatedCharacter Character) (interface{}, error)
 	return result, nil
 }
 
-func DeleteCharacter(id string) (interface{}, error) {
-	client := RunMongo()
+func DeleteCharacter(id string, client *mongo.Client) (interface{}, error) {
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	// Convert the string ID to ObjectID
@@ -116,7 +111,7 @@ func DeleteCharacter(id string) (interface{}, error) {
 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
 	}
 
-	character, err := GetCharacterById(id)
+	character, err := GetCharacterById(id, client)
 
 	if err != nil {
 		return nil, fmt.Errorf("no character found with the given ID")
@@ -135,7 +130,7 @@ func DeleteCharacter(id string) (interface{}, error) {
 		fmt.Println(deleteMediaResult)
 	}
 
-	deleteCommentResult, err := DeleteCommentByContentId(id, "character")
+	deleteCommentResult, err := DeleteCommentByContentId(id, "character", client)
 	if err != nil {
 		return nil, fmt.Errorf("error during deleting comments")
 	}
@@ -151,8 +146,7 @@ func DeleteCharacter(id string) (interface{}, error) {
 	return result, nil
 }
 
-func GetAllCharactersFromAnime(anime_id string) ([]Character, error) {
-	client := RunMongo()
+func GetAllCharactersFromAnime(anime_id string, client *mongo.Client) ([]Character, error) {
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	// Convert the string ID to ObjectID
@@ -178,8 +172,7 @@ func GetAllCharactersFromAnime(anime_id string) ([]Character, error) {
 	return result, nil
 }
 
-func GetCharactersFirstName() ([]Character, error) {
-	client := RunMongo()
+func GetCharactersFirstName(client *mongo.Client) ([]Character, error) {
 	collection := client.Database("Anime-Zone").Collection("Characters")
 
 	opts := options.Find().SetSort(bson.D{{Key: "last_name", Value: 1}}).SetLimit(10)

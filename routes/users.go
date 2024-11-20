@@ -8,9 +8,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Registration(c *gin.Context) {
+func Registration(c *gin.Context, client *mongo.Client) {
 	var newUser database.User
 	var newUserUploader database.UserUploader
 
@@ -32,7 +33,7 @@ func Registration(c *gin.Context) {
 		Logo:     logoUrl,
 	}
 
-	insertedID, err := database.RegisterUser(newUser)
+	insertedID, err := database.RegisterUser(newUser, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -46,13 +47,13 @@ type LoginRequest struct {
 	Password string `json:"password"`
 }
 
-func Login(c *gin.Context) {
+func Login(c *gin.Context, client *mongo.Client) {
 	var loginRequest LoginRequest
 	if err := c.BindJSON(&loginRequest); err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	result, err := database.LoginUser(loginRequest.Email, loginRequest.Password)
+	result, err := database.LoginUser(loginRequest.Email, loginRequest.Password, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -65,7 +66,7 @@ func Login(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, gin.H{"token": userToken})
 }
 
-func PutUser(c *gin.Context) {
+func PutUser(c *gin.Context, client *mongo.Client) {
 	var updatedUser database.User
 
 	id := c.Param("id")
@@ -75,7 +76,7 @@ func PutUser(c *gin.Context) {
 		return
 	}
 
-	result, err := database.EditUser(id, updatedUser)
+	result, err := database.EditUser(id, updatedUser, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -85,10 +86,10 @@ func PutUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }
 
-func GetUser(c *gin.Context) {
+func GetUser(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	user, err := database.GetUser(id)
+	user, err := database.GetUser(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})

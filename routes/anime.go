@@ -8,12 +8,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
 
 	"strconv"
 )
 
-func GetAnime(c *gin.Context) {
-	anime, err := database.GetAllAnime()
+func GetAnime(c *gin.Context, client *mongo.Client) {
+	anime, err := database.GetAllAnime(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime"})
 		return
@@ -21,10 +22,10 @@ func GetAnime(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-func GetAnimeById(c *gin.Context) {
+func GetAnimeById(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	anime, err := database.GetAnimeById(id)
+	anime, err := database.GetAnimeById(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -33,10 +34,10 @@ func GetAnimeById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-func GetAnimeByTitle(c *gin.Context) {
+func GetAnimeByTitle(c *gin.Context, client *mongo.Client) {
 	title := c.Param("title")
 
-	anime, err := database.GetAnimeByTitle(title)
+	anime, err := database.GetAnimeByTitle(title, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -45,7 +46,7 @@ func GetAnimeByTitle(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-func PostAnime(c *gin.Context) {
+func PostAnime(c *gin.Context, client *mongo.Client) {
 	var newAnime database.Anime
 	var newAnimeUploader database.AnimeUploader
 
@@ -87,7 +88,7 @@ func PostAnime(c *gin.Context) {
 	newAnime.Logo = logoUrl
 	newAnime.Media = mediaURLs
 
-	insertedID, err := database.UploadAnime(newAnime)
+	insertedID, err := database.UploadAnime(newAnime, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
@@ -96,7 +97,7 @@ func PostAnime(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, result)
 }
 
-func PutAnime(c *gin.Context) {
+func PutAnime(c *gin.Context, client *mongo.Client) {
 	var updatedAnime database.Anime
 
 	id := c.Param("id")
@@ -106,7 +107,7 @@ func PutAnime(c *gin.Context) {
 		return
 	}
 
-	result, err := database.UpdateAnime(id, updatedAnime)
+	result, err := database.UpdateAnime(id, updatedAnime, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -116,9 +117,9 @@ func PutAnime(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": result})
 }
 
-func DeleteAnime(c *gin.Context) {
+func DeleteAnime(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
-	anime, err := database.DeleteAnime(id)
+	anime, err := database.DeleteAnime(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -132,7 +133,7 @@ type RatingRequest struct {
 	Review string  `json:"review"` // optional
 }
 
-func RateAnime(c *gin.Context) {
+func RateAnime(c *gin.Context, client *mongo.Client) {
 	// Parse the rating request body
 	anime_id := c.Param("id")
 	user_id, exists := c.Get("id")
@@ -153,7 +154,7 @@ func RateAnime(c *gin.Context) {
 		return
 	}
 
-	result, err := database.PostRating(anime_id, user_id.(string), username.(string), ratingRequest.Score, ratingRequest.Review)
+	result, err := database.PostRating(anime_id, user_id.(string), username.(string), ratingRequest.Score, ratingRequest.Review, client)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to submit rating"})
@@ -163,10 +164,10 @@ func RateAnime(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Rating submitted successfully!"})
 }
 
-func GetAnimeRatingById(c *gin.Context) {
+func GetAnimeRatingById(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	anime, err := database.GetAnimeRatingById(id)
+	anime, err := database.GetAnimeRatingById(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -175,10 +176,10 @@ func GetAnimeRatingById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-func GetAnimeRatingByUser(c *gin.Context) {
+func GetAnimeRatingByUser(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	anime, err := database.GetAnimeRatingByUserId(id)
+	anime, err := database.GetAnimeRatingByUserId(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -187,8 +188,8 @@ func GetAnimeRatingByUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-func GetHighestRatedAnime(c *gin.Context) {
-	anime, err := database.GetHighestRatedAnime()
+func GetHighestRatedAnime(c *gin.Context, client *mongo.Client) {
+	anime, err := database.GetHighestRatedAnime(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime"})
 		return
@@ -196,8 +197,8 @@ func GetHighestRatedAnime(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-func GetMostPopularAnime(c *gin.Context) {
-	anime, err := database.GetMostPopularAnime()
+func GetMostPopularAnime(c *gin.Context, client *mongo.Client) {
+	anime, err := database.GetMostPopularAnime(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime"})
 		return
@@ -205,21 +206,81 @@ func GetMostPopularAnime(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, anime)
 }
 
-func GetSimilarAnime(c *gin.Context) {
+func GetSimilarAnime(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 
-	anime, err := database.GetAnimeById(id)
+	anime, err := database.GetAnimeById(id, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 
-	result, err := database.GetSimilarAnime(anime.Genre, anime.Studio, id)
+	result, err := database.GetSimilarAnime(anime.Genre, anime.Studio, id, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	c.IndentedJSON(http.StatusOK, result)
+}
+
+type AnimeDetailsResult struct {
+	Anime        database.Anime       `json:"anime"`
+	SimilarAnime []database.Anime     `json:"similar_anime"`
+	AnimeReviews []database.Rating    `json:"reviews"`
+	Characters   []database.Character `json:"characters"`
+	AnimeList    []database.AnimeList `json:"anime_list"`
+	Comments     []database.Comment   `json:"comments"`
+}
+
+func GetAnimeDetails(c *gin.Context, client *mongo.Client) {
+	id := c.Param("id")
+
+	anime, err := database.GetAnimeById(id, client)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	similarAnime, err := database.GetSimilarAnime(anime.Genre, anime.Studio, id, client)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	animeReviews, err := database.GetAnimeRatingById(id, client)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	characters, err := database.GetAllCharactersFromAnime(id, client)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	animeList, err := database.GetAllAnimeListsByAnimeId(id, client)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	comment, err := database.GetAllCommentsForContent("anime", id, client)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	var result AnimeDetailsResult
+	result.Anime = *anime
+	result.SimilarAnime = similarAnime
+	result.AnimeReviews = animeReviews
+	result.Characters = characters
+	result.AnimeList = animeList
+	result.Comments = comment
 
 	c.IndentedJSON(http.StatusOK, result)
 }
