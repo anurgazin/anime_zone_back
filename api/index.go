@@ -43,6 +43,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	router.GET("/anime/details/:id", func(c *gin.Context) { routes.GetAnimeDetails(c, client) })
 
+	router.GET("/anime/list/:id", func(c *gin.Context) { routes.GetAllAnimeFromList(c, client) })
+
 	router.GET("/anime/title/:title", func(c *gin.Context) { routes.GetAnimeByTitle(c, client) })
 	router.GET("/anime/rating/:id", func(c *gin.Context) { routes.GetAnimeRatingById(c, client) })
 	router.GET("/anime/rating/user/:id", func(c *gin.Context) { routes.GetAnimeRatingByUser(c, client) })

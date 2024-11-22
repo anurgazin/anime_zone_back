@@ -426,3 +426,21 @@ func GetSimilarAnime(genres []string, studios []string, id string, client *mongo
 	fmt.Println("Retrieved similar anime")
 	return result, nil
 }
+
+func GetAllAnimeFromList(anime_list AnimeList, client *mongo.Client) ([]Anime, error) {
+	anime_collection := client.Database("Anime-Zone").Collection("Anime")
+
+	filter := bson.M{"_id": bson.M{"$in": anime_list.AnimeList}}
+
+	cursor, err := anime_collection.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find similar anime: %w", err)
+	}
+
+	var result []Anime
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		return nil, fmt.Errorf("failed to decode similar anime: %w", err)
+	}
+	fmt.Println("Retrieved all anime from  list")
+	return result, nil
+}

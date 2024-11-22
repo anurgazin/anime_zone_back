@@ -284,3 +284,40 @@ func GetAnimeDetails(c *gin.Context, client *mongo.Client) {
 
 	c.IndentedJSON(http.StatusOK, result)
 }
+
+type AnimeListDetails struct {
+	Anime     []database.Anime   `json:"anime"`
+	AnimeList database.AnimeList `json:"anime_list"`
+	Comments  []database.Comment `json:"comments"`
+}
+
+func GetAllAnimeFromList(c *gin.Context, client *mongo.Client) {
+	id := c.Param("id")
+
+	list, err := database.GetAnimeListById(id, client)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	anime, err := database.GetAllAnimeFromList(*list, client)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	comment, err := database.GetAllCommentsForContent("anime_list", id, client)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	var result AnimeListDetails
+	result.Anime = anime
+	result.AnimeList = *list
+	result.Comments = comment
+
+	c.IndentedJSON(http.StatusOK, result)
+}
