@@ -22,7 +22,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Auth", "Accept", "User-Agent", "Cache-Control", "Pragma"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Auth", "Accept", "User-Agent", "Cache-Control", "Pragma", "RefreshToken"}
 	config.ExposeHeaders = []string{"Content-Length"}
 	config.AllowCredentials = true
 	router.Use(cors.New(config))
@@ -32,6 +32,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.POST("/login", func(c *gin.Context) { routes.Login(c, client) })
 	router.GET("/user/:id", func(c *gin.Context) { routes.GetUser(c, client) })
 	router.PUT("/user/:id", middleware.AuthToken, func(c *gin.Context) { routes.PutUser(c, client) })
+
+	router.POST("/refresh", func(c *gin.Context) { middleware.RefreshToken(c, client) })
 
 	router.GET("/anime", func(c *gin.Context) { routes.GetAnime(c, client) })
 	router.GET("/anime/highest", func(c *gin.Context) { routes.GetHighestRatedAnime(c, client) })
@@ -52,6 +54,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.GET("/characters", func(c *gin.Context) { routes.GetCharacters(c, client) })
 	router.GET("/characters/name/asc", func(c *gin.Context) { routes.GetCharactersFirstName(c, client) })
 	router.GET("/characters/id/:id", func(c *gin.Context) { routes.GetCharactersById(c, client) })
+	router.GET("/characters/details/:id", func(c *gin.Context) { routes.GetCharacterDetails(c, client) })
 	router.GET("/characters/anime/:id", func(c *gin.Context) { routes.GetCharactersByAnimeId(c, client) })
 	router.POST("/characters", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PostCharacters(c, client) })
 	router.PUT("/characters/:id", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PutCharacters(c, client) })

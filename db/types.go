@@ -151,6 +151,11 @@ type User struct {
 	Logo     string             `bson:"logo" json:"logo"`
 }
 
+type TokenPair struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 // User struct represents User information
 type UserUploader struct {
 	ID       primitive.ObjectID    `bson:"_id" json:"id" form:"id"`
