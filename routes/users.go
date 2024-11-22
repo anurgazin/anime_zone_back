@@ -58,12 +58,12 @@ func Login(c *gin.Context, client *mongo.Client) {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	userToken, err := jwt.CreateToken(result.(database.User))
+	userToken, err := jwt.CreateTokens(result.(database.User))
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	c.IndentedJSON(http.StatusCreated, gin.H{"token": userToken})
+	c.IndentedJSON(http.StatusCreated, gin.H{"access_token": userToken.AccessToken, "refresh_token": userToken.RefreshToken})
 }
 
 func PutUser(c *gin.Context, client *mongo.Client) {

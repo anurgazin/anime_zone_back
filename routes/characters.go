@@ -164,3 +164,38 @@ func GetCharactersFirstName(g *gin.Context, client *mongo.Client) {
 	}
 	g.IndentedJSON(http.StatusOK, characters)
 }
+
+type CharacterDetailsResult struct {
+	Character      database.Character       `json:"character"`
+	CharactersList []database.CharacterList `json:"characters_list"`
+	Comments       []database.Comment       `json:"comments"`
+}
+
+func GetCharacterDetails(g *gin.Context, client *mongo.Client) {
+	id := g.Param("id")
+	character, err := database.GetCharacterById(id, client)
+
+	if err != nil {
+		g.IndentedJSON(http.StatusNotFound, gin.H{"message": "character not found"})
+		return
+	}
+
+	comment, err := database.GetAllCommentsForContent("character", id, client)
+	if err != nil {
+		g.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	characterList, err := database.GetAllCharacterListsByCharacterId(id, client)
+	if err != nil {
+		g.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	var result CharacterDetailsResult
+	result.Character = *character
+	result.Comments = comment
+	result.CharactersList = characterList
+
+	g.IndentedJSON(http.StatusOK, result)
+}
