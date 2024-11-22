@@ -46,6 +46,9 @@ func main() {
 	router.GET("/anime/title/:title", func(c *gin.Context) { routes.GetAnimeByTitle(c, client) })
 	router.GET("/anime/rating/:id", func(c *gin.Context) { routes.GetAnimeRatingById(c, client) })
 	router.GET("/anime/rating/user/:id", func(c *gin.Context) { routes.GetAnimeRatingByUser(c, client) })
+
+	router.GET("/anime/list/:id", func(c *gin.Context) { routes.GetAllAnimeFromList(c, client) })
+
 	router.POST("/anime", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PostAnime(c, client) })
 	router.POST("/anime/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.RateAnime(c, client) })
 	router.PUT("/anime/:id", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PutAnime(c, client) })
