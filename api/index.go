@@ -57,6 +57,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.GET("/characters/name/asc", func(c *gin.Context) { routes.GetCharactersFirstName(c, client) })
 	router.GET("/characters/id/:id", func(c *gin.Context) { routes.GetCharactersById(c, client) })
 	router.GET("/characters/details/:id", func(c *gin.Context) { routes.GetCharacterDetails(c, client) })
+
+	router.GET("/characters/list/:id", func(c *gin.Context) { routes.GetAllCharactersFromList(c, client) })
+
 	router.GET("/characters/anime/:id", func(c *gin.Context) { routes.GetCharactersByAnimeId(c, client) })
 	router.POST("/characters", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PostCharacters(c, client) })
 	router.PUT("/characters/:id", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PutCharacters(c, client) })
