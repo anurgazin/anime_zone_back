@@ -199,3 +199,40 @@ func GetCharacterDetails(g *gin.Context, client *mongo.Client) {
 
 	g.IndentedJSON(http.StatusOK, result)
 }
+
+type CharacterListDetails struct {
+	Characters    []database.Character   `json:"characters"`
+	CharacterList database.CharacterList `json:"characters_list"`
+	Comments      []database.Comment     `json:"comments"`
+}
+
+func GetAllCharactersFromList(c *gin.Context, client *mongo.Client) {
+	id := c.Param("id")
+
+	list, err := database.GetCharacterListById(id, client)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	characters, err := database.GetAllCharactersFromList(*list, client)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	comment, err := database.GetAllCommentsForContent("character_list", id, client)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	var result CharacterListDetails
+	result.Characters = characters
+	result.CharacterList = *list
+	result.Comments = comment
+
+	c.IndentedJSON(http.StatusOK, result)
+}
