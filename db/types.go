@@ -230,3 +230,26 @@ type PostListRequest struct {
 	Username    string   `json:"username"`
 	ContentList []string `json:"content_list"`
 }
+
+type ScoreType string
+type ScoreUser struct {
+	UserID   primitive.ObjectID `bson:"user_id" json:"user_id"`
+	Username string             `bson:"username" json:"username"`
+}
+
+// Define constants for Status
+const (
+	ScoreTypeComment       ScoreType = "comment"
+	ScoreTypeRating        ScoreType = "rating"
+	ScoreTypeAnimeList     ScoreType = "anime_list"
+	ScoreTypeCharacterList ScoreType = "character_list"
+)
+
+type Score struct {
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	ContentType ScoreType          `bson:"content_type" json:"content_type"`
+	ContentID   primitive.ObjectID `bson:"content_id" json:"content_id"` // Reference to the Content
+	User        ScoreUser          `bson:"user" json:"user"`             // ID of the user giving the rating
+	Score       int                `bson:"score" json:"score"`           // Rating score
+	Timestamp   time.Time          `bson:"timestamp" json:"timestamp"`   // When the rating was given
+}

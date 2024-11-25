@@ -20,7 +20,7 @@ func CreateTokens(user database.User) (*database.TokenPair, error) {
 		"username": user.Username,
 		"id":       user.ID,
 		"role":     user.Role,
-		"exp":      time.Now().Add(10 * time.Second).Unix(), // Expiration time for access token
+		"exp":      time.Now().Add(15 * time.Minute).Unix(), // Expiration time for access token
 		"iat":      time.Now().Unix(),                       // Issued at
 	})
 

@@ -180,6 +180,19 @@ type UpdateRatingAction struct {
 
 func UpdateCommentRating(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
+
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+	username, exists := c.Get("username")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
 	var updateData UpdateRatingAction
 
 	// Bind the action (increment or decrement) from the request
@@ -188,19 +201,19 @@ func UpdateCommentRating(c *gin.Context, client *mongo.Client) {
 		return
 	}
 	// Determine the increment value based on the action
-	var incrementValue float64
+	var incrementValue int
 	if updateData.Action == "increment" {
-		incrementValue = 1.0
+		incrementValue = 1
 	} else if updateData.Action == "decrement" {
-		incrementValue = -1.0
+		incrementValue = -1
 	} else {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid action. Use 'increment' or 'decrement'."})
 		return
 	}
 
-	result, err := database.UpdateCommentRating(id, incrementValue, client)
+	result, err := database.UpdateCommentRating(id, incrementValue, username.(string), user_id.(string), client)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update comment rating or comment not found"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	fmt.Println(result)
