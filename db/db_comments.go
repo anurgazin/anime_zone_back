@@ -193,29 +193,107 @@ func DeleteCommentByContentId(content_id string, content_type string, client *mo
 	return result, nil
 }
 
-func UpdateCommentRating(id string, value float64, client *mongo.Client) (interface{}, error) {
-	collection := client.Database("Anime-Zone").Collection("Comments")
+func UpdateCommentRating(id string, value int, username string, user_id string, client *mongo.Client) (interface{}, error) {
+	scoreCollection := client.Database("Anime-Zone").Collection("Score")
+	commentCollection := client.Database("Anime-Zone").Collection("Comments")
 
 	// Convert the string ID to ObjectID
-	objID, err := primitive.ObjectIDFromHex(id)
+	commentID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
 	}
 
-	filter := bson.M{"_id": objID}
-	update := bson.M{"$inc": bson.M{"rating": value}}
-	result, err := collection.UpdateOne(context.TODO(), filter, update)
-
+	userID, err := primitive.ObjectIDFromHex(user_id)
 	if err != nil {
-		return nil, fmt.Errorf("could not update comment rating: %w", err)
+		return nil, fmt.Errorf("invalid user ID: %w", err)
 	}
 
-	if result.MatchedCount == 0 {
-		return nil, fmt.Errorf("no comment found with the given ID")
+	// Filter to find an existing score by the same user for the comment
+	filter := bson.M{"content_type": ScoreTypeComment, "content_id": commentID, "user.user_id": userID}
+
+	var existingScore Score
+	err = scoreCollection.FindOne(context.TODO(), filter).Decode(&existingScore)
+	if err != nil && err != mongo.ErrNoDocuments {
+		return nil, fmt.Errorf("error finding existing score: %w", err)
 	}
 
-	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
-	return result, nil
+	if err == nil {
+		// Update the existing score
+		update := bson.M{
+			"$set": bson.M{
+				"score":     value,
+				"timestamp": time.Now(),
+			},
+		}
+		_, err := scoreCollection.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			return nil, fmt.Errorf("error updating existing score: %w", err)
+		}
+
+		// Recalculate and update the comment rating
+		err = updateCommentRating(commentID, scoreCollection, commentCollection)
+		if err != nil {
+			return nil, fmt.Errorf("error updating comment rating: %w", err)
+		}
+
+		return "Score updated successfully", nil
+	}
+
+	// Create a new score if none exists
+	newScore := Score{
+		ID:          primitive.NewObjectID(),
+		ContentID:   commentID,
+		User:        ScoreUser{UserID: userID, Username: username},
+		Score:       value,
+		Timestamp:   time.Now(),
+		ContentType: ScoreTypeComment,
+	}
+
+	_, err = scoreCollection.InsertOne(context.TODO(), newScore)
+	if err != nil {
+		return nil, fmt.Errorf("error inserting new score: %w", err)
+	}
+
+	// Recalculate and update the comment rating
+	err = updateCommentRating(commentID, scoreCollection, commentCollection)
+	if err != nil {
+		return nil, fmt.Errorf("error updating comment rating: %w", err)
+	}
+
+	return "Score created successfully", nil
+}
+
+func updateCommentRating(commentID primitive.ObjectID, scoreCollection *mongo.Collection, commentCollection *mongo.Collection) error {
+	filter := bson.M{"content_type": ScoreTypeComment, "content_id": commentID}
+
+	cursor, err := scoreCollection.Find(context.TODO(), filter)
+	if err != nil {
+		return fmt.Errorf("error finding scores: %w", err)
+	}
+	defer cursor.Close(context.TODO())
+
+	// Calculate the total score
+	var totalScore int
+	for cursor.Next(context.TODO()) {
+		var score Score
+		if err := cursor.Decode(&score); err != nil {
+			return fmt.Errorf("error decoding score: %w", err)
+		}
+		totalScore += score.Score
+	}
+
+	// Update the comment's rating
+	update := bson.M{
+		"$set": bson.M{
+			"rating": totalScore,
+		},
+	}
+	_, err = commentCollection.UpdateOne(context.TODO(), bson.M{"_id": commentID}, update)
+	if err != nil {
+		return fmt.Errorf("error updating comment rating: %w", err)
+	}
+
+	return nil
 }
 
 func GetAllCommentsForContent(content_type string, content_id string, client *mongo.Client) ([]Comment, error) {

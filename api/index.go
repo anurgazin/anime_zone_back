@@ -44,11 +44,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	router.GET("/anime/details/:id", func(c *gin.Context) { routes.GetAnimeDetails(c, client) })
 
-	router.GET("/anime/list/:id", func(c *gin.Context) { routes.GetAllAnimeFromList(c, client) })
-
 	router.GET("/anime/title/:title", func(c *gin.Context) { routes.GetAnimeByTitle(c, client) })
 	router.GET("/anime/rating/:id", func(c *gin.Context) { routes.GetAnimeRatingById(c, client) })
 	router.GET("/anime/rating/user/:id", func(c *gin.Context) { routes.GetAnimeRatingByUser(c, client) })
+
+	router.GET("/anime/list/:id", func(c *gin.Context) { routes.GetAllAnimeFromList(c, client) })
+
 	router.POST("/anime", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PostAnime(c, client) })
 	router.POST("/anime/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.RateAnime(c, client) })
 	router.PUT("/anime/:id", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PutAnime(c, client) })
@@ -90,7 +91,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.GET("/comment/user/:id", func(c *gin.Context) { routes.GetCommentForUser(c, client) })
 	router.POST("/comment", middleware.AuthToken, func(c *gin.Context) { routes.PostComment(c, client) })
 	router.PATCH("/comment/id/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateComment(c, client) })
-	router.PATCH("/comment/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateCommentRating(c, client) })
+
+	router.POST("/comment/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateCommentRating(c, client) })
+
 	router.DELETE("/comment/id/:id", middleware.AuthToken, func(c *gin.Context) { routes.DeleteComment(c, client) })
 
 	router.ServeHTTP(w, r)
