@@ -81,8 +81,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.POST("/list/characters/add/:id", middleware.AuthToken, func(c *gin.Context) { routes.AddCharacterToList(c, client) })
 	router.PATCH("/list/anime/edit/:id", middleware.AuthToken, func(c *gin.Context) { routes.EditAnimeList(c, client) })
 	router.PATCH("/list/characters/edit/:id", middleware.AuthToken, func(c *gin.Context) { routes.EditCharacterList(c, client) })
-	router.PATCH("/list/anime/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateAnimeListRating(c, client) })
-	router.PATCH("/list/characters/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateCharacterListRating(c, client) })
+
+	router.POST("/list/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateListRating(c, client) })
 
 	router.GET("/comment", func(c *gin.Context) { routes.GetAllComments(c, client) })
 	router.GET("/comment/type/:type", func(c *gin.Context) { routes.GetCommentByType(c, client) })

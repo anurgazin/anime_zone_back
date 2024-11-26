@@ -243,11 +243,24 @@ func EditCharacterList(c *gin.Context, client *mongo.Client) {
 }
 
 type UpdateListRatingAction struct {
-	Action string `json:"action" form:"action"` // "increment" or "decrement"
+	ListType string `json:"list_type" form:"list_type"`
+	Action   string `json:"action" form:"action"` // "increment" or "decrement"
 }
 
-func UpdateAnimeListRating(c *gin.Context, client *mongo.Client) {
+func UpdateListRating(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+	username, exists := c.Get("username")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
 	var updateData UpdateListRatingAction
 
 	// Bind the action (increment or decrement) from the request
@@ -256,50 +269,23 @@ func UpdateAnimeListRating(c *gin.Context, client *mongo.Client) {
 		return
 	}
 	// Determine the increment value based on the action
-	var incrementValue float64
+	var incrementValue int
 	if updateData.Action == "increment" {
-		incrementValue = 1.0
+		incrementValue = 1
 	} else if updateData.Action == "decrement" {
-		incrementValue = -1.0
+		incrementValue = -1
 	} else {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid action. Use 'increment' or 'decrement'."})
 		return
 	}
 
-	_, err := database.UpdateAnimeListRating(id, incrementValue, client)
+	result, err := database.UpdateListRating(id, updateData.ListType, user_id.(string), username.(string), incrementValue, client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update anime list rating or anime list not found"})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Anime List rating updated successfully"})
-}
-
-func UpdateCharacterListRating(c *gin.Context, client *mongo.Client) {
-	id := c.Param("id")
-	var updateData UpdateListRatingAction
-
-	// Bind the action (increment or decrement) from the request
-	if err := c.ShouldBindJSON(&updateData); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
-		return
-	}
-	// Determine the increment value based on the action
-	var incrementValue float64
-	if updateData.Action == "increment" {
-		incrementValue = 1.0
-	} else if updateData.Action == "decrement" {
-		incrementValue = -1.0
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid action. Use 'increment' or 'decrement'."})
-		return
-	}
-
-	_, err := database.UpdateCharacterListRating(id, incrementValue, client)
-	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update character list rating or character list not found"})
-		return
-	}
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "Character List rating updated successfully"})
+	fmt.Println(result)
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "List rating updated successfully"})
 }
 
 func GetAnimeListsByAnimeId(c *gin.Context, client *mongo.Client) {

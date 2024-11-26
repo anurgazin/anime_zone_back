@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -327,55 +328,102 @@ func UpdateCharacterList(id string, user_id string, text string, client *mongo.C
 	return result, nil
 }
 
-func UpdateAnimeListRating(id string, value float64, client *mongo.Client) (interface{}, error) {
-	collection := client.Database("Anime-Zone").Collection("AnimeList")
+func UpdateListRating(id, listType, userID, username string, value int, client *mongo.Client) (interface{}, error) {
+	scoreCollection := client.Database("Anime-Zone").Collection("Score")
 
-	// Convert the string ID to ObjectID
-	objID, err := primitive.ObjectIDFromHex(id)
+	// Convert IDs
+	listID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		fmt.Println(err.Error())
-		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+		return nil, fmt.Errorf("invalid list ID: %w", err)
 	}
-
-	filter := bson.M{"_id": objID}
-	update := bson.M{"$inc": bson.M{"rating": value}}
-	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	userObjectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
-		return nil, fmt.Errorf("could not update anime list rating: %w", err)
+		return nil, fmt.Errorf("invalid user ID: %w", err)
 	}
 
-	if result.MatchedCount == 0 {
-		return nil, fmt.Errorf("no anime list found with the given ID")
+	// Determine collection and filter based on listType
+	var (
+		listCollection *mongo.Collection
+		scoreType      ScoreType
+	)
+	switch listType {
+	case "anime_list":
+		listCollection = client.Database("Anime-Zone").Collection("AnimeList")
+		scoreType = ScoreTypeAnimeList
+	case "character_list":
+		listCollection = client.Database("Anime-Zone").Collection("CharacterList")
+		scoreType = ScoreTypeCharacterList
+	default:
+		return nil, fmt.Errorf("invalid list type")
 	}
 
-	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
-	return result, nil
+	filter := bson.M{
+		"content_type": scoreType,
+		"content_id":   listID,
+		"user.user_id": userObjectID,
+	}
+
+	// Check for existing score
+	var existingScore Score
+	err = scoreCollection.FindOne(context.TODO(), filter).Decode(&existingScore)
+	if err != nil && err != mongo.ErrNoDocuments {
+		return nil, fmt.Errorf("error finding existing score: %w", err)
+	}
+
+	if err == nil {
+		// Update existing score
+		update := bson.M{
+			"$set": bson.M{"score": value, "timestamp": time.Now()},
+		}
+		if _, err := scoreCollection.UpdateOne(context.TODO(), filter, update); err != nil {
+			return nil, fmt.Errorf("error updating score: %w", err)
+		}
+	} else {
+		// Insert new score
+		newScore := Score{
+			ID:          primitive.NewObjectID(),
+			ContentID:   listID,
+			User:        ScoreUser{UserID: userObjectID, Username: username},
+			Score:       value,
+			Timestamp:   time.Now(),
+			ContentType: scoreType,
+		}
+		if _, err := scoreCollection.InsertOne(context.TODO(), newScore); err != nil {
+			return nil, fmt.Errorf("error inserting score: %w", err)
+		}
+	}
+
+	// Update the list rating
+	if err := updateListRating(listID, scoreType, scoreCollection, listCollection); err != nil {
+		return nil, fmt.Errorf("error updating list rating: %w", err)
+	}
+
+	return "Score updated successfully", nil
 }
 
-func UpdateCharacterListRating(id string, value float64, client *mongo.Client) (interface{}, error) {
-	//client := RunMongo()
-	collection := client.Database("Anime-Zone").Collection("CharacterList")
-
-	// Convert the string ID to ObjectID
-	objID, err := primitive.ObjectIDFromHex(id)
+func updateListRating(listID primitive.ObjectID, scoreType ScoreType, scoreCollection, listCollection *mongo.Collection) error {
+	cursor, err := scoreCollection.Find(context.TODO(), bson.M{"content_type": scoreType, "content_id": listID})
 	if err != nil {
-		fmt.Println(err.Error())
-		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+		return fmt.Errorf("error finding scores: %w", err)
+	}
+	defer cursor.Close(context.TODO())
+
+	// Calculate total score
+	totalScore := 0
+	for cursor.Next(context.TODO()) {
+		var score Score
+		if err := cursor.Decode(&score); err != nil {
+			return fmt.Errorf("error decoding score: %w", err)
+		}
+		totalScore += score.Score
 	}
 
-	filter := bson.M{"_id": objID}
-	update := bson.M{"$inc": bson.M{"rating": value}}
-	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	// Update list rating
+	_, err = listCollection.UpdateOne(context.TODO(), bson.M{"_id": listID}, bson.M{"$set": bson.M{"rating": totalScore}})
 	if err != nil {
-		return nil, fmt.Errorf("could not update character list rating: %w", err)
+		return fmt.Errorf("error updating list rating: %w", err)
 	}
-
-	if result.MatchedCount == 0 {
-		return nil, fmt.Errorf("no character list found with the given ID")
-	}
-
-	fmt.Printf("Successfully updated %v document(s)\n", result.ModifiedCount)
-	return result, nil
+	return nil
 }
 
 func GetAllAnimeListsByAnimeId(anime_id string, client *mongo.Client) ([]AnimeList, error) {
