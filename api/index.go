@@ -69,6 +69,10 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	router.GET("/list/anime", func(c *gin.Context) { routes.GetAnimeLists(c, client) })
 	router.GET("/list/characters", func(c *gin.Context) { routes.GetCharacterLists(c, client) })
+
+	router.GET("/list/anime/details", func(c *gin.Context) { routes.GetAnimeListsWithAnime(c, client) })
+	router.GET("/list/characters/details", func(c *gin.Context) { routes.GetCharacterListsWithCharacters(c, client) })
+
 	router.GET("/list/anime/:id", func(c *gin.Context) { routes.GetAnimeListById(c, client) })
 	router.GET("/list/characters/:id", func(c *gin.Context) { routes.GetCharacterListById(c, client) })
 	router.GET("/list/anime/anime/:id", func(c *gin.Context) { routes.GetAnimeListsByAnimeId(c, client) })

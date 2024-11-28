@@ -335,3 +335,49 @@ func GetCharacterListsByUserId(c *gin.Context, client *mongo.Client) {
 	}
 	c.IndentedJSON(http.StatusOK, animeList)
 }
+
+type AnimeListsWithContent struct {
+	AnimeList database.AnimeList `json:"anime_list"`
+	Anime     []database.Anime   `json:"anime"`
+}
+
+func GetAnimeListsWithAnime(c *gin.Context, client *mongo.Client) {
+	animeList, err := database.GetAllAnimeLists(client)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime lists"})
+		return
+	}
+	var result []AnimeListsWithContent
+	for _, list := range animeList {
+		anime, err := database.GetAllAnimeFromList(list, client)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime lists"})
+			return
+		}
+		result = append(result, AnimeListsWithContent{AnimeList: list, Anime: anime})
+	}
+	c.IndentedJSON(http.StatusOK, result)
+}
+
+type CharactersListsWithContent struct {
+	CharactersList database.CharacterList `json:"characters_list"`
+	Characters     []database.Character   `json:"characters"`
+}
+
+func GetCharacterListsWithCharacters(c *gin.Context, client *mongo.Client) {
+	characterList, err := database.GetAllCharacterLists(client)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve character lists"})
+		return
+	}
+	var result []CharactersListsWithContent
+	for _, list := range characterList {
+		characters, err := database.GetAllCharactersFromList(list, client)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve character lists"})
+			return
+		}
+		result = append(result, CharactersListsWithContent{CharactersList: list, Characters: characters})
+	}
+	c.IndentedJSON(http.StatusOK, result)
+}
