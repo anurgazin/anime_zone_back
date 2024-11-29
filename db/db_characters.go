@@ -209,3 +209,23 @@ func GetAllCharactersFromList(characters_list CharacterList, client *mongo.Clien
 	fmt.Println("Retrieved all characters from list")
 	return result, nil
 }
+
+func GetCharactersFromListToDisplay(characters_list CharacterList, client *mongo.Client) ([]Character, error) {
+	anime_collection := client.Database("Anime-Zone").Collection("Characters")
+
+	filter := bson.M{"_id": bson.M{"$in": characters_list.CharacterList}}
+
+	opts := options.Find().SetLimit(5)
+
+	cursor, err := anime_collection.Find(context.TODO(), filter, opts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find character from list: %w", err)
+	}
+
+	var result []Character
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		return nil, fmt.Errorf("failed to decode characters from list: %w", err)
+	}
+	fmt.Println("Retrieved all characters from list")
+	return result, nil
+}

@@ -349,7 +349,7 @@ func GetAnimeListsWithAnime(c *gin.Context, client *mongo.Client) {
 	}
 	var result []AnimeListsWithContent
 	for _, list := range animeList {
-		anime, err := database.GetAllAnimeFromList(list, client)
+		anime, err := database.GetAnimeFromListToDisplay(list, client)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime lists"})
 			return
@@ -372,7 +372,7 @@ func GetCharacterListsWithCharacters(c *gin.Context, client *mongo.Client) {
 	}
 	var result []CharactersListsWithContent
 	for _, list := range characterList {
-		characters, err := database.GetAllCharactersFromList(list, client)
+		characters, err := database.GetCharactersFromListToDisplay(list, client)
 		if err != nil {
 			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve character lists"})
 			return
