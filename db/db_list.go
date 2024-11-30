@@ -23,6 +23,7 @@ func CreateAnimeList(list PostListRequest, client *mongo.Client) (interface{}, e
 	listUser.Username = list.Username
 	animeList.User = listUser
 	animeList.Name = list.ListTitle
+	animeList.Public = list.Public
 	animeList.AnimeList = []primitive.ObjectID{}
 	for _, a := range list.ContentList {
 		animeId, err := primitive.ObjectIDFromHex(a)
@@ -53,6 +54,7 @@ func CreateCharacterList(list PostListRequest, client *mongo.Client) (interface{
 	listUser.Username = list.Username
 	characterList.User = listUser
 	characterList.Name = list.ListTitle
+	characterList.Public = list.Public
 	characterList.CharacterList = []primitive.ObjectID{}
 	for _, c := range list.ContentList {
 		characterId, err := primitive.ObjectIDFromHex(c)
@@ -178,10 +180,45 @@ func GetAllAnimeLists(client *mongo.Client) ([]AnimeList, error) {
 	return result, nil
 }
 
+func GetAllAnimeListsToDisplay(client *mongo.Client) ([]AnimeList, error) {
+	collection := client.Database("Anime-Zone").Collection("AnimeList")
+
+	cursor, err := collection.Find(context.TODO(), bson.M{"public": true})
+	if err != nil {
+		panic(err)
+	}
+
+	var result []AnimeList
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all anime lists")
+	return result, nil
+}
+
 func GetAllCharacterLists(client *mongo.Client) ([]CharacterList, error) {
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	cursor, err := collection.Find(context.TODO(), bson.D{})
+	if err != nil {
+		panic(err)
+	}
+
+	var result []CharacterList
+	if err := cursor.All(context.TODO(), &result); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	fmt.Println("Retrieved all character lists")
+	return result, nil
+}
+func GetAllCharacterListsToDisplay(client *mongo.Client) ([]CharacterList, error) {
+	collection := client.Database("Anime-Zone").Collection("CharacterList")
+
+	cursor, err := collection.Find(context.TODO(), bson.M{"public": true})
 	if err != nil {
 		panic(err)
 	}
@@ -436,7 +473,7 @@ func GetAllAnimeListsByAnimeId(anime_id string, client *mongo.Client) ([]AnimeLi
 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
 	}
 
-	filter := bson.M{"anime_list": objID}
+	filter := bson.M{"anime_list": objID, "public": true}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		panic(err)
@@ -462,7 +499,7 @@ func GetAllCharacterListsByCharacterId(character_id string, client *mongo.Client
 		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
 	}
 
-	filter := bson.M{"character_list": objID}
+	filter := bson.M{"character_list": objID, "public": true}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		panic(err)

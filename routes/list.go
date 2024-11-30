@@ -342,7 +342,7 @@ type AnimeListsWithContent struct {
 }
 
 func GetAnimeListsWithAnime(c *gin.Context, client *mongo.Client) {
-	animeList, err := database.GetAllAnimeLists(client)
+	animeList, err := database.GetAllAnimeListsToDisplay(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve anime lists"})
 		return
@@ -365,7 +365,7 @@ type CharactersListsWithContent struct {
 }
 
 func GetCharacterListsWithCharacters(c *gin.Context, client *mongo.Client) {
-	characterList, err := database.GetAllCharacterLists(client)
+	characterList, err := database.GetAllCharacterListsToDisplay(client)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve character lists"})
 		return
