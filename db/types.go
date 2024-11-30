@@ -178,6 +178,7 @@ type AnimeList struct {
 	ID        primitive.ObjectID   `bson:"_id" json:"id"`
 	Name      string               `bson:"name" json:"name"`
 	User      ListUser             `bson:"user" json:"user"`
+	Public    bool                 `bson:"public" json:"public"`
 	AnimeList []primitive.ObjectID `bson:"anime_list" json:"anime_list"`
 	Rating    float64              `bson:"rating" json:"rating"`
 }
@@ -187,6 +188,7 @@ type CharacterList struct {
 	ID            primitive.ObjectID   `bson:"_id" json:"id"`
 	Name          string               `bson:"name" json:"name"`
 	User          ListUser             `bson:"user" json:"user"`
+	Public        bool                 `bson:"public" json:"public"`
 	CharacterList []primitive.ObjectID `bson:"character_list" json:"character_list"`
 	Rating        float64              `bson:"rating" json:"rating"`
 }
@@ -228,6 +230,7 @@ type PostListRequest struct {
 	ListTitle   string   `json:"title"`
 	UserId      string   `json:"user_id"`
 	Username    string   `json:"username"`
+	Public      bool     `bson:"public" json:"public"`
 	ContentList []string `json:"content_list"`
 }
 
