@@ -281,7 +281,7 @@ func GetCharacterListById(id string, client *mongo.Client) (*CharacterList, erro
 	return &result, nil
 }
 
-func UpdateAnimeList(id string, user_id string, text string, client *mongo.Client) (interface{}, error) {
+func UpdateAnimeList(id string, user_id string, text string, content []string, public bool, client *mongo.Client) (interface{}, error) {
 	collection := client.Database("Anime-Zone").Collection("AnimeList")
 
 	// Convert the string ID to ObjectID
@@ -303,9 +303,21 @@ func UpdateAnimeList(id string, user_id string, text string, client *mongo.Clien
 	if listData.User.UserID != objUserID {
 		return nil, fmt.Errorf("only user whom created list can edit it")
 	}
+
+	animeList := []primitive.ObjectID{}
+	for _, a := range content {
+		animeId, err := primitive.ObjectIDFromHex(a)
+		if err != nil {
+			return nil, fmt.Errorf("invalid AnimeId format: %w", err)
+		}
+		animeList = append(animeList, animeId)
+	}
+
 	update := bson.M{
 		"$set": bson.M{
-			"name": text,
+			"name":       text,
+			"anime_list": animeList,
+			"public":     public,
 		},
 	}
 
@@ -323,7 +335,7 @@ func UpdateAnimeList(id string, user_id string, text string, client *mongo.Clien
 	return result, nil
 }
 
-func UpdateCharacterList(id string, user_id string, text string, client *mongo.Client) (interface{}, error) {
+func UpdateCharacterList(id string, user_id string, text string, content []string, public bool, client *mongo.Client) (interface{}, error) {
 	collection := client.Database("Anime-Zone").Collection("CharacterList")
 
 	// Convert the string ID to ObjectID
@@ -345,9 +357,21 @@ func UpdateCharacterList(id string, user_id string, text string, client *mongo.C
 	if listData.User.UserID != objUserID {
 		return nil, fmt.Errorf("only user whom created list can edit it")
 	}
+
+	characterList := []primitive.ObjectID{}
+	for _, c := range content {
+		characterId, err := primitive.ObjectIDFromHex(c)
+		if err != nil {
+			return nil, fmt.Errorf("invalid AnimeId format: %w", err)
+		}
+		characterList = append(characterList, characterId)
+	}
+
 	update := bson.M{
 		"$set": bson.M{
-			"name": text,
+			"name":           text,
+			"character_list": characterList,
+			"public":         public,
 		},
 	}
 

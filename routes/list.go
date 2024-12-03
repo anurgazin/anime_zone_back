@@ -189,7 +189,9 @@ func GetCharacterListById(c *gin.Context, client *mongo.Client) {
 }
 
 type UpdateList struct {
-	Name string `bson:"name" json:"name"`
+	Name    string   `bson:"name" json:"name"`
+	Content []string `bson:"content" json:"content"`
+	Public  bool     `bson:"public" json:"public"`
 }
 
 func EditAnimeList(c *gin.Context, client *mongo.Client) {
@@ -203,12 +205,12 @@ func EditAnimeList(c *gin.Context, client *mongo.Client) {
 		return
 	}
 
-	if err := c.BindJSON(&updateAnimeList); err != nil {
+	if err := c.ShouldBind(&updateAnimeList); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid text"})
 		return
 	}
 
-	result, err := database.UpdateAnimeList(id, user_id.(string), updateAnimeList.Name, client)
+	result, err := database.UpdateAnimeList(id, user_id.(string), updateAnimeList.Name, updateAnimeList.Content, updateAnimeList.Public, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
@@ -233,7 +235,7 @@ func EditCharacterList(c *gin.Context, client *mongo.Client) {
 		return
 	}
 
-	result, err := database.UpdateCharacterList(id, user_id.(string), updateCharList.Name, client)
+	result, err := database.UpdateCharacterList(id, user_id.(string), updateCharList.Name, updateCharList.Content, updateCharList.Public, client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
