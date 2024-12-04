@@ -21,7 +21,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
-	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS"}
+	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Auth", "Accept", "User-Agent", "Cache-Control", "Pragma", "RefreshToken"}
 	config.ExposeHeaders = []string{"Content-Length"}
 	config.AllowCredentials = true
@@ -86,6 +86,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.PUT("/list/characters/edit/:id", middleware.AuthToken, func(c *gin.Context) { routes.EditCharacterList(c, client) })
 
 	router.POST("/list/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateListRating(c, client) })
+
+	router.DELETE("/list/anime/delete/:id", middleware.AuthToken, func(c *gin.Context) { routes.DeleteAnimeList(c, client) })
 
 	router.GET("/comment", func(c *gin.Context) { routes.GetAllComments(c, client) })
 	router.GET("/comment/type/:type", func(c *gin.Context) { routes.GetCommentByType(c, client) })

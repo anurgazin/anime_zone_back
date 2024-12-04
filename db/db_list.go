@@ -590,3 +590,67 @@ func GetAllCharacterListsByUserId(user_id string, client *mongo.Client) ([]Chara
 	fmt.Println("Retrieved all characters lists with given user")
 	return result, nil
 }
+
+func DeleteAnimeList(id string, user_id string, user_role string, client *mongo.Client) (interface{}, error) {
+	anime_list_collection := client.Database("Anime-Zone").Collection("AnimeList")
+	//character_collection := client.Database("Anime-Zone").Collection("CharacterList")
+	// comment_collection := client.Database("Anime-Zone").Collection("Comment")
+	score_collection := client.Database("Anime-Zone").Collection("Score")
+
+	// Convert the string ID to ObjectID
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	// Convert the string ID to ObjectID
+	usrID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+
+	var animeList AnimeList
+
+	err = anime_list_collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&animeList)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no anime list found with the given ID")
+		}
+		return nil, fmt.Errorf("could not fetch anime list: %w", err)
+	}
+
+	// Check if the user is the author or an admin
+	if animeList.User.UserID != usrID && user_role != "admin" {
+		return nil, fmt.Errorf("unauthorized: only the author or an admin can delete this anime list")
+	}
+
+	anime_result, err := anime_list_collection.DeleteOne(context.TODO(), filter)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not delete anime: %w", err)
+	}
+
+	if anime_result.DeletedCount == 0 {
+		return nil, fmt.Errorf("no anime found with the given ID")
+	}
+
+	score_filter := bson.M{"content_type": "anime_list", "content_id": objID}
+	score_result, err := score_collection.DeleteMany(context.TODO(), score_filter)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not delete anime list: %w", err)
+	}
+
+	comment_result, err := DeleteCommentByContentId(id, "anime_list", client)
+	if err != nil {
+		return nil, fmt.Errorf("error during deleting comments")
+	}
+
+	return map[string]interface{}{
+		"deleted_anime_list_count": anime_result.DeletedCount,
+		"deleted_scores_count":     score_result.DeletedCount,
+		"deleted_comment_count":    comment_result,
+	}, nil
+}
