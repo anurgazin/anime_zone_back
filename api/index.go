@@ -89,6 +89,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	router.POST("/list/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateListRating(c, client) })
 
 	router.DELETE("/list/anime/delete/:id", middleware.AuthToken, func(c *gin.Context) { routes.DeleteAnimeList(c, client) })
+	router.DELETE("/list/characters/delete/:id", middleware.AuthToken, func(c *gin.Context) { routes.DeleteCharacterList(c, client) })
 
 	router.GET("/comment", func(c *gin.Context) { routes.GetAllComments(c, client) })
 	router.GET("/comment/type/:type", func(c *gin.Context) { routes.GetCommentByType(c, client) })

@@ -398,11 +398,37 @@ func DeleteAnimeList(c *gin.Context, client *mongo.Client) {
 		c.Abort()
 		return
 	}
-	anime, err := database.DeleteAnimeList(id, user_id.(string), role.(string), client)
+	result, err := database.DeleteAnimeList(id, user_id.(string), role.(string), client)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
-	c.IndentedJSON(http.StatusOK, anime)
+	fmt.Println(result)
+	c.IndentedJSON(http.StatusOK, result)
+}
+
+func DeleteCharacterList(c *gin.Context, client *mongo.Client) {
+	id := c.Param("id")
+	role, exists := c.Get("role")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Role not found"})
+		c.Abort()
+		return
+	}
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+	result, err := database.DeleteCharactersList(id, user_id.(string), role.(string), client)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+
+	fmt.Println(result)
+	c.IndentedJSON(http.StatusOK, result)
 }
