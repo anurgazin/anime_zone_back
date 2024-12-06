@@ -14,6 +14,7 @@ func UploadComment(comment Comment, client *mongo.Client) (interface{}, error) {
 	collection := client.Database("Anime-Zone").Collection("Comments")
 	comment.ID = primitive.NewObjectID()
 	comment.Timestamp = time.Now()
+	comment.Edited = false
 	insertResult, err := collection.InsertOne(context.TODO(), comment)
 	if err != nil {
 		fmt.Println(err)
@@ -153,7 +154,8 @@ func UpdateComment(id string, user_id string, text string, client *mongo.Client)
 	}
 	update := bson.M{
 		"$set": bson.M{
-			"text": text,
+			"text":   text,
+			"edited": true,
 		},
 	}
 

@@ -217,6 +217,7 @@ type Comment struct {
 	Text      string             `bson:"text" json:"text"`
 	Timestamp time.Time          `bson:"timestamp" json:"timestamp" form:"timestamp"`
 	Rating    float64            `bson:"rating" json:"rating"`
+	Edited    bool               `bson:"edited" json:"edited"`
 }
 type CommentUploader struct {
 	Type      CommentType `bson:"type" json:"type"`
