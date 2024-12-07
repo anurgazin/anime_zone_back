@@ -92,9 +92,17 @@ This document provides an overview of all API endpoints available in the applica
   - **Access**: Anyone
   - **Description**: Retrieves all anime lists.
 
+- **`GET /list/anime/details`**
+  - **Access**: Anyone
+  - **Description**: Retrieves all anime lists with their content.
+
 - **`GET /list/characters`**
   - **Access**: Anyone
   - **Description**: Retrieves all character lists.
+
+- **`GET /list/characters/details`**
+  - **Access**: Anyone
+  - **Description**: Retrieves all character lists with their content.
 
 - **`GET /list/anime/:id`**
   - **Access**: Anyone
@@ -120,30 +128,33 @@ This document provides an overview of all API endpoints available in the applica
   - **Access**: Authorized users
   - **Description**: Creates a new character list.
 
-- **`PATCH /list/anime/add/:id`**
+- **`POST /list/anime/add/:id`**
   - **Access**: Authorized users
   - **Description**: Adds an anime to a list by list ID.
 
-- **`PATCH /list/characters/add/:id`**
+- **`POST /list/characters/add/:id`**
   - **Access**: Authorized users
   - **Description**: Adds a character to a list by list ID.
 
-- **`PATCH /list/anime/edit/:id`**
+- **`PUT /list/anime/edit/:id`**
   - **Access**: Authorized users
   - **Description**: Edits an anime list by ID.
 
-- **`PATCH /list/characters/edit/:id`**
+- **`PUT /list/characters/edit/:id`**
   - **Access**: Authorized users
   - **Description**: Edits a character list by ID.
 
-- **`PATCH /list/anime/rating/:id`**
+- **`POST /list/rating/:id`**
   - **Access**: Authorized users
-  - **Description**: Updates the rating for an anime list by list ID.
+  - **Description**: Updates the rating for a list by list ID.
 
-- **`PATCH /list/characters/rating/:id`**
+- **`DELETE /list/anime/delete/:id`**
   - **Access**: Authorized users
-  - **Description**: Updates the rating for a character list by list ID.
+  - **Description**: Deletes anime Lists and All Scores and Comments by List ID.
 
+- **`DELETE /list/characters/delete/:id`**
+  - **Access**: Authorized users
+  - **Description**: Deletes characters Lists and All Scores and Comments by List ID.
 ---
 
 ## Comment Routes
@@ -164,6 +175,10 @@ This document provides an overview of all API endpoints available in the applica
   - **Access**: Anyone
   - **Description**: Retrieves comments associated with a specific type and ID.
 
+- **`GET /comment/user/:id`**
+  - **Access**: Anyone
+  - **Description**: Retrieves comments associated with a specific user.
+
 - **`POST /comment`**
   - **Access**: Authorized users
   - **Description**: Posts a new comment.
@@ -172,7 +187,7 @@ This document provides an overview of all API endpoints available in the applica
   - **Access**: Authorized users
   - **Description**: Updates a comment by ID.
 
-- **`PATCH /comment/rating/:id`**
+- **`POST /comment/rating/:id`**
   - **Access**: Authorized users
   - **Description**: Updates the rating of a comment by ID.
 
