@@ -91,6 +91,7 @@ func GetCommentById(id string, client *mongo.Client) (*Comment, error) {
 
 func DeleteComment(id string, user_id string, user_role string, client *mongo.Client) (interface{}, error) {
 	collection := client.Database("Anime-Zone").Collection("Comments")
+	score_collection := client.Database("Anime-Zone").Collection("Score")
 
 	// Convert the string ID to ObjectID
 	objID, err := primitive.ObjectIDFromHex(id)
@@ -116,18 +117,28 @@ func DeleteComment(id string, user_id string, user_role string, client *mongo.Cl
 		}
 	}
 
-	result, err := collection.DeleteOne(context.TODO(), filter)
+	score_filter := bson.M{"content_type": "comment", "content_id": objID}
+	score_result, err := score_collection.DeleteMany(context.TODO(), score_filter)
+
+	if err != nil {
+		return nil, fmt.Errorf("could not delete character list: %w", err)
+	}
+
+	comment_result, err := collection.DeleteOne(context.TODO(), filter)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not delete comment: %w", err)
 	}
 
-	if result.DeletedCount == 0 {
+	if comment_result.DeletedCount == 0 {
 		return nil, fmt.Errorf("no comment found with the given ID")
 	}
 
-	fmt.Printf("Successfully updated %v document(s)\n", result.DeletedCount)
-	return result, nil
+	fmt.Printf("Successfully updated %v document(s)\n", comment_result.DeletedCount)
+	return map[string]interface{}{
+		"deleted_scores_count":  score_result.DeletedCount,
+		"deleted_comment_count": comment_result.DeletedCount,
+	}, nil
 }
 
 func UpdateComment(id string, user_id string, text string, client *mongo.Client) (interface{}, error) {
