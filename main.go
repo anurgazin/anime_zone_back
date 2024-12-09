@@ -43,6 +43,8 @@ func main() {
 
 	router.GET("/anime/details/:id", func(c *gin.Context) { routes.GetAnimeDetails(c, client) })
 
+	router.GET("/anime/rating/id/:id", func(c *gin.Context) {})
+
 	router.GET("/anime/title/:title", func(c *gin.Context) { routes.GetAnimeByTitle(c, client) })
 	router.GET("/anime/rating/:id", func(c *gin.Context) { routes.GetAnimeRatingById(c, client) })
 	router.GET("/anime/rating/user/:id", func(c *gin.Context) { routes.GetAnimeRatingByUser(c, client) })
@@ -53,6 +55,8 @@ func main() {
 	router.POST("/anime/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.RateAnime(c, client) })
 	router.PUT("/anime/:id", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.PutAnime(c, client) })
 	router.DELETE("/anime/:id", middleware.AuthToken, middleware.IsAdmin, func(c *gin.Context) { routes.DeleteAnime(c, client) })
+
+	router.PUT("/anime/rating/:id", middleware.AuthToken, func(c *gin.Context) { routes.UpdateRating(c, client) })
 
 	router.GET("/characters", func(c *gin.Context) { routes.GetCharacters(c, client) })
 	router.GET("/characters/name/asc", func(c *gin.Context) { routes.GetCharactersFirstName(c, client) })

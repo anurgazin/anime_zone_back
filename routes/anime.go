@@ -164,6 +164,32 @@ func RateAnime(c *gin.Context, client *mongo.Client) {
 	c.JSON(http.StatusOK, gin.H{"message": "Rating submitted successfully!"})
 }
 
+func UpdateRating(c *gin.Context, client *mongo.Client) {
+	// Parse the rating request body
+	review_id := c.Param("id")
+	user_id, exists := c.Get("id")
+	if !exists {
+		c.IndentedJSON(http.StatusUnauthorized, gin.H{"error": "User Id not found"})
+		c.Abort()
+		return
+	}
+
+	var ratingRequest RatingRequest
+	if err := c.ShouldBindJSON(&ratingRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	result, err := database.EditRating(review_id, user_id.(string), ratingRequest.Score, ratingRequest.Review, client)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update rating"})
+		return
+	}
+	fmt.Println(result)
+	c.JSON(http.StatusOK, gin.H{"message": "Rating updated successfully!"})
+}
+
 func GetAnimeRatingById(c *gin.Context, client *mongo.Client) {
 	id := c.Param("id")
 

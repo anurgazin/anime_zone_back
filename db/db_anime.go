@@ -242,6 +242,68 @@ func PostRating(anime_id string, user_id string, username string, score float64,
 	return result.InsertedID, nil
 }
 
+func EditRating(review_id string, user_id string, score float64, review string, client *mongo.Client) (interface{}, error) {
+	rating_collection := client.Database("Anime-Zone").Collection("Rating")
+	anime_collection := client.Database("Anime-Zone").Collection("Anime")
+
+	// Validate AnimeID and UserID as valid MongoDB ObjectIDs
+	objID, err := primitive.ObjectIDFromHex(review_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid review ID: %w", err)
+	}
+
+	userID, err := primitive.ObjectIDFromHex(user_id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user ID: %w", err)
+	}
+
+	filter := bson.M{
+		"_id": objID,
+	}
+
+	var result Rating
+	err = rating_collection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no review found with the given ID")
+		}
+		return nil, fmt.Errorf("error finding review: %w", err)
+	}
+
+	if result.User.UserID != userID {
+		return nil, fmt.Errorf("only user whom created review can edit it")
+	}
+
+	// Define the update document
+	update := bson.M{
+		"$set": bson.M{
+			"score":     score,
+			"review":    review,
+			"timestamp": time.Now(),
+		},
+	}
+
+	// Perform the update operation
+	updateResult, err := rating_collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update rating: %w", err)
+	}
+
+	// If no document was updated, the rating does not exist
+	if updateResult.MatchedCount == 0 {
+		return nil, fmt.Errorf("rating not found for the specified anime and user")
+	}
+
+	// Update the anime's average rating and rating count
+	updateAnimeRating(result.AnimeID, rating_collection, anime_collection)
+
+	return map[string]interface{}{
+		"matched_count":  updateResult.MatchedCount,
+		"modified_count": updateResult.ModifiedCount,
+	}, nil
+}
+
 // Helper function to update anime's average rating and rating count
 func updateAnimeRating(animeID primitive.ObjectID, rating_collection *mongo.Collection, anime_collection *mongo.Collection) {
 	// Fetch all ratings for this anime
