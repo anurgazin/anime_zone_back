@@ -526,3 +526,27 @@ func GetAnimeFromListToDisplay(anime_list AnimeList, client *mongo.Client) ([]An
 	fmt.Println("Retrieved all anime from  list")
 	return result, nil
 }
+
+func GetReviewById(id string, client *mongo.Client) (*Rating, error) {
+	collection := client.Database("Anime-Zone").Collection("Rating")
+
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ObjectID format: %w", err)
+	}
+
+	filter := bson.M{"_id": objID}
+
+	var result Rating
+	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, fmt.Errorf("no anime found with the given ID")
+		}
+		return nil, fmt.Errorf("error finding anime: %w", err)
+	}
+
+	// Return the found anime
+	return &result, nil
+}
