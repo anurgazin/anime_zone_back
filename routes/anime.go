@@ -347,3 +347,15 @@ func GetAllAnimeFromList(c *gin.Context, client *mongo.Client) {
 
 	c.IndentedJSON(http.StatusOK, result)
 }
+
+func GetAnimeReviewsById(c *gin.Context, client *mongo.Client) {
+	id := c.Param("id")
+
+	review, err := database.GetReviewById(id, client)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, review)
+}
